@@ -36,15 +36,33 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
   String ans = '';
   String prev = '';
   String oper = '';
   double num1 = 0.0;
   double num2 = 0.0;
   double temp = 0.0;
+  bool justcalc = false;
+
+  bool darkTheme = false;
+  Color textboxColor = Colors.white;
+  Color backgroundColor = Colors.white;
+  Color appbarColor = Colors.deepOrange.shade800;
+  IconData themeIcon = Icons.dark_mode;
+
+  var style1 = ElevatedButton.styleFrom(backgroundColor: Colors.red.shade400, foregroundColor: Colors.white,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),);
+  var style2 = ElevatedButton.styleFrom(backgroundColor: Colors.deepOrange.shade300, foregroundColor: Colors.white,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),);
+  var style3 = ElevatedButton.styleFrom(backgroundColor: Colors.deepOrange.shade50, foregroundColor: Colors.deepOrange.shade900,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),);
 
   void _backspace(){
     setState(() {
+      if (justcalc == true) {
+        _clear();
+      }
       ans = ans.substring(0, ans.length - 1);
     });
   }
@@ -56,11 +74,13 @@ class _MyHomePageState extends State<MyHomePage> {
       num1 = 0.0;
       num2 = 0.0;
       oper = '';
+      justcalc = false;
     });
   }
 
   void _calculate() {
     setState(() {
+      justcalc = true;
       if (ans.isNotEmpty) {
         num2 = double.parse(ans);
         if (oper == '+') {
@@ -98,11 +118,17 @@ class _MyHomePageState extends State<MyHomePage> {
         }
         _checkifint();
       }
+      else {
+        justcalc = false;
+      }
     });
   }
 
   void _numClicked(numC){
     setState(() {
+      if (justcalc == true) {
+        _clear();
+      }
       if (numC=='.'){
         if (!ans.contains('.')){
           ans = ans + numC;
@@ -116,10 +142,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _operclicked(String ope){
     setState(() {
+      justcalc = false;
       if (ans.isNotEmpty) {
         prev = ans;
         if (oper != '') {
           _calculate();
+          justcalc = false;
           prev = ans;
           num1 = double.parse(ans);
           ans = '';
@@ -142,11 +170,13 @@ class _MyHomePageState extends State<MyHomePage> {
       temp = double.parse(ans) * (-1);
       ans = temp.toString();
       _checkifint();
+      justcalc == false;
     });
   }
 
   void _percentage(){
     setState(() {
+      justcalc == true;
       temp = double.parse(ans) * 100.0;
       ans = temp.toString();
       _checkifint();
@@ -155,11 +185,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _constants(k){
     setState(() {
+      if (justcalc == true) {
+        _clear();
+      }
       if (k == 'pi') {
         ans = '3.14159';
+        justcalc == false;
       }
       else if (k == 'e') {
         ans = '2.71828';
+        justcalc == false;
       }
     });
   }
@@ -169,6 +204,7 @@ class _MyHomePageState extends State<MyHomePage> {
       temp = double.parse(ans) * double.parse(ans);
       ans = temp.toString();
       _checkifint();
+      justcalc == true;
     });
   }
 
@@ -177,47 +213,109 @@ class _MyHomePageState extends State<MyHomePage> {
       temp = double.parse(ans) * double.parse(ans) * double.parse(ans);
       ans = temp.toString();
       _checkifint();
+      justcalc == true;
     });
   }
 
   void _checkifint(){
-    if ((double.parse(ans)-((double.parse(ans)).round()).toDouble())==0.0) {
-      ans = ((double.parse(ans)).round()).toString();
-    }
-    if (prev.isNotEmpty) {
-      if ((double.parse(prev)-((double.parse(prev)).round()).toDouble())==0.0) {
-        prev = ((double.parse(prev)).round()).toString();
+    setState(() {
+      if ((double.parse(ans) - ((double.parse(ans)).round()).toDouble()) ==
+          0.0) {
+        ans = ((double.parse(ans)).round()).toString();
       }
-    }
+      if (prev.isNotEmpty) {
+        if ((double.parse(prev) - ((double.parse(prev)).round()).toDouble()) ==
+            0.0) {
+          prev = ((double.parse(prev)).round()).toString();
+        }
+      }
+    });
   }
 
   void _nullfunction() {}
+
+  void _darkTheme() {
+    setState(() {
+      if (!darkTheme) {
+        backgroundColor = Colors.black;
+        darkTheme = true;
+        textboxColor = Colors.white70;
+        appbarColor = Colors.black;
+        themeIcon = Icons.light_mode;
+
+        style1 = ElevatedButton.styleFrom(
+          backgroundColor: Colors.cyan.shade900, foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20)),);
+        style2 = ElevatedButton.styleFrom(
+          backgroundColor: Colors.blueGrey.shade600,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20)),);
+        style3 = ElevatedButton.styleFrom(
+          backgroundColor: Colors.blueGrey.shade900,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20)),);
+      }
+      else {
+        backgroundColor = Colors.white;
+        darkTheme = false;
+        textboxColor = Colors.white;
+        appbarColor = Colors.deepOrange.shade800;
+        themeIcon = Icons.dark_mode;
+
+        style1 = ElevatedButton.styleFrom(
+          backgroundColor: Colors.red.shade400, foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20)),);
+        style2 = ElevatedButton.styleFrom(
+          backgroundColor: Colors.deepOrange.shade300,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20)),);
+        style3 = ElevatedButton.styleFrom(
+          backgroundColor: Colors.deepOrange.shade50,
+          foregroundColor: Colors.deepOrange.shade900,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20)),);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
 
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+    FittedBox textstyle(String txt) {
+      return FittedBox(fit: BoxFit.scaleDown, child: Text(txt, style: const TextStyle(fontSize: 40),),);
+    }
 
     return Scaffold(
       appBar: AppBar( foregroundColor: Colors.white,
-        backgroundColor: Colors.deepOrange.shade800,
+        backgroundColor: appbarColor,
         title: Text(widget.title),centerTitle: true,
         actions: <Widget>[
           IconButton(
-            icon: const Icon(Icons.calculate_outlined),
-            onPressed: () {_nullfunction();},),],
+            icon: Icon(themeIcon),
+            onPressed: () {
+              setState(() {
+                _darkTheme();
+              });
+            },),],
       ),
 
       body:
-      Column(
+    Container(color: backgroundColor, child:
+    Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           SizedBox(width: screenWidth*0.975, height: screenHeight*0.07, child: OutlinedButton(style: TextButton.styleFrom
-            (shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))), onPressed: _nullfunction,
+            (shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)), backgroundColor: textboxColor), onPressed: _nullfunction,
             child: Text(prev, style: Theme.of(context).textTheme.headlineSmall,),),),
           SizedBox(width: screenWidth*0.975, height: screenHeight*0.07, child: OutlinedButton(style: TextButton.styleFrom
-            (shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))), onPressed: _nullfunction,
+            (shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)), backgroundColor: textboxColor), onPressed: _nullfunction,
             child: Text(ans, style: Theme.of(context).textTheme.headlineSmall,),),),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -225,179 +323,85 @@ class _MyHomePageState extends State<MyHomePage> {
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red.shade400,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ), onPressed: _clear , child: const FittedBox(fit: BoxFit.scaleDown, child: Text('C', style: TextStyle(fontSize: 40),),),),),
+                  ElevatedButton(style: style1, onPressed: _clear , child: textstyle('C'),),),
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange.shade300,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ), onPressed: _square , child: const FittedBox(fit: BoxFit.scaleDown, child: Text('x²', style: TextStyle(fontSize: 40),),),),),
+                  ElevatedButton(style: style2, onPressed: _square , child: textstyle('x²'),),),
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange.shade300,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ), onPressed: _cube , child: const FittedBox(fit: BoxFit.scaleDown, child: Text('x³', style: TextStyle(fontSize: 40),),),),),
+                  ElevatedButton(style: style2, onPressed: _cube , child: textstyle('x³'),),),
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red.shade400,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ),  onPressed: _calculate , child: const FittedBox(fit: BoxFit.scaleDown, child: FittedBox(fit: BoxFit.scaleDown, child: Text('=', style: TextStyle(fontSize: 40),),),),),),
+                  ElevatedButton(style: style1,  onPressed: _backspace , child:
+                    const FittedBox(fit: BoxFit.scaleDown, child: Icon(Icons.backspace),),),),
                 ],
               ),
               SizedBox(height: screenHeight*0.02),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange.shade300,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ), onPressed: _percentage , child: const FittedBox(fit: BoxFit.scaleDown, child: Text('%', style: TextStyle(fontSize: 40),),),),),
+                  ElevatedButton(style: style2, onPressed: _percentage , child: textstyle('%'),),),
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange.shade300,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ), onPressed: (){_constants('e');} , child: const FittedBox(fit: BoxFit.scaleDown, child: Text('e', style: TextStyle(fontSize: 40),),),),),
+                  ElevatedButton(style: style2, onPressed: (){_constants('e');} , child: textstyle('e'),),),
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange.shade300,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ), onPressed: (){_constants('pi');} , child: const FittedBox(fit: BoxFit.scaleDown, child: Text('π', style: TextStyle(fontSize: 40),),),),),
+                  ElevatedButton(style: style2, onPressed: (){_constants('pi');} , child: textstyle('π'),),),
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red.shade400,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ),  onPressed: (){_operclicked('+');} , child: const FittedBox(fit: BoxFit.scaleDown, child: FittedBox(fit: BoxFit.scaleDown, child: Text('+', style: TextStyle(fontSize: 40),),),),),),
+                  ElevatedButton(style: style2,  onPressed: (){_operclicked('+');} , child: textstyle('+'),),),
                 ],
               ),
               SizedBox(height: screenHeight*0.02),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange.shade50,
-                    foregroundColor: Colors.deepOrange.shade900,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ), onPressed: (){_numClicked('7');} , child: const FittedBox(fit: BoxFit.scaleDown, child: Text('7', style: TextStyle(fontSize: 40),),),),),
+                  ElevatedButton(style: style3, onPressed: (){_numClicked('7');} , child: textstyle('7'),),),
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange.shade50,
-                    foregroundColor: Colors.deepOrange.shade900,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ), onPressed: (){_numClicked('8');} , child: const FittedBox(fit: BoxFit.scaleDown, child: Text('8', style: TextStyle(fontSize: 40),),),),),
+                  ElevatedButton(style: style3, onPressed: (){_numClicked('8');} , child: textstyle('8'),),),
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange.shade50,
-                    foregroundColor: Colors.deepOrange.shade900,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ), onPressed: (){_numClicked('9');} , child: const FittedBox(fit: BoxFit.scaleDown, child: Text('9', style: TextStyle(fontSize: 40),),),),),
+                  ElevatedButton(style: style3, onPressed: (){_numClicked('9');} , child: textstyle('9'),),),
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red.shade400,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ),  onPressed: (){_operclicked('-');} , child: const FittedBox(fit: BoxFit.scaleDown, child: FittedBox(fit: BoxFit.scaleDown, child: Text('-', style: TextStyle(fontSize: 40),),),),),),
+                  ElevatedButton(style: style2,  onPressed: (){_operclicked('-');} , child: textstyle('-'),),),
                 ],
               ),
               SizedBox(height: screenHeight*0.02),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange.shade50,
-                    foregroundColor: Colors.deepOrange.shade900,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ), onPressed: (){_numClicked('4');} , child: const FittedBox(fit: BoxFit.scaleDown, child: Text('4', style: TextStyle(fontSize: 40),),),),),
+                  ElevatedButton(style: style3, onPressed: (){_numClicked('4');} , child: textstyle('4'),),),
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange.shade50,
-                    foregroundColor: Colors.deepOrange.shade900,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ), onPressed: (){_numClicked('5');} , child: const FittedBox(fit: BoxFit.scaleDown, child: Text('5', style: TextStyle(fontSize: 40),),),),),
+                  ElevatedButton(style: style3, onPressed: (){_numClicked('5');} , child: textstyle('5'),),),
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange.shade50,
-                    foregroundColor: Colors.deepOrange.shade900,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ), onPressed: (){_numClicked('6');} , child: const FittedBox(fit: BoxFit.scaleDown, child: Text('6', style: TextStyle(fontSize: 40),),),),),
+                  ElevatedButton(style: style3, onPressed: (){_numClicked('6');} , child: textstyle('6'),),),
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red.shade400,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ),  onPressed: (){_operclicked('x');} , child: const FittedBox(fit: BoxFit.scaleDown, child: FittedBox(fit: BoxFit.scaleDown, child: Text('x', style: TextStyle(fontSize: 40),),),),),),
+                  ElevatedButton(style: style2,  onPressed: (){_operclicked('x');} , child: textstyle('x'),),),
                 ],
               ),
               SizedBox(height: screenHeight*0.02),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange.shade50,
-                    foregroundColor: Colors.deepOrange.shade900,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ), onPressed: (){_numClicked('1');} , child: const FittedBox(fit: BoxFit.scaleDown, child: Text('1', style: TextStyle(fontSize: 40),),),),),
+                  ElevatedButton(style: style3, onPressed: (){_numClicked('1');} , child: textstyle('1'),),),
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange.shade50,
-                    foregroundColor: Colors.deepOrange.shade900,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ), onPressed: (){_numClicked('2');} , child: const FittedBox(fit: BoxFit.scaleDown, child: Text('2', style: TextStyle(fontSize: 40),),),),),
+                  ElevatedButton(style: style3, onPressed: (){_numClicked('2');} , child: textstyle('2'),),),
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange.shade50,
-                    foregroundColor: Colors.deepOrange.shade900,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ), onPressed: (){_numClicked('3');} , child: const FittedBox(fit: BoxFit.scaleDown, child: Text('3', style: TextStyle(fontSize: 40),),),),),
+                  ElevatedButton(style: style3, onPressed: (){_numClicked('3');} , child: textstyle('3'),),),
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red.shade400,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ),  onPressed: (){_operclicked('÷');} , child: const FittedBox(fit: BoxFit.scaleDown, child: FittedBox(fit: BoxFit.scaleDown, child: Text('÷', style: TextStyle(fontSize: 40),),),),),),
+                  ElevatedButton(style: style2,  onPressed: (){_operclicked('÷');} , child: textstyle('÷'),),),
                 ],
               ),
               SizedBox(height: screenHeight*0.02),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange.shade300,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ), onPressed: _changesign , child: const FittedBox(fit: BoxFit.scaleDown, child: Text('±', style: TextStyle(fontSize: 40),),),),),
+                  ElevatedButton(style: style2, onPressed: _changesign , child: textstyle('±'),),),
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange.shade50,
-                    foregroundColor: Colors.deepOrange.shade900,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ), onPressed: (){_numClicked('0');} , child: const FittedBox(fit: BoxFit.scaleDown, child: Text('0', style: TextStyle(fontSize: 40),),),),),
+                  ElevatedButton(style: style3, onPressed: (){_numClicked('0');} , child: textstyle('0'),),),
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                    ElevatedButton(style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepOrange.shade300,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    ), onPressed: (){_numClicked('.');} , child: const FittedBox(fit: BoxFit.scaleDown, child: Text('.', style: TextStyle(fontSize: 30),),),),),
+                  ElevatedButton(style: style2, onPressed: (){_numClicked('.');} , child: textstyle('.'),),),
                   SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                    ElevatedButton(style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red.shade400,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    ),  onPressed: _backspace , child: const FittedBox(fit: BoxFit.scaleDown, child: Icon(Icons.backspace_outlined),),),),
+                  ElevatedButton(style: style1,  onPressed: _calculate ,child: textstyle('='),),),
                 ],
               ),
             ],),
         ],
       ),
+    ),
     );
   }
 }
