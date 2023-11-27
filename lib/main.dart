@@ -176,8 +176,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _percentage(){
     setState(() {
+      temp = double.parse(ans) / 100.0;
       justcalc == true;
-      temp = double.parse(ans) * 100.0;
       ans = temp.toString();
       _checkifint();
     });
@@ -219,13 +219,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _checkifint(){
     setState(() {
-      if ((double.parse(ans) - ((double.parse(ans)).round()).toDouble()) ==
-          0.0) {
+      if ((double.parse(ans) - ((double.parse(ans)).round()).toDouble()).abs() <= 0.0001) {
         ans = ((double.parse(ans)).round()).toString();
       }
       if (prev.isNotEmpty) {
-        if ((double.parse(prev) - ((double.parse(prev)).round()).toDouble()) ==
-            0.0) {
+        if ((double.parse(prev) - ((double.parse(prev)).round()).toDouble()).abs() <= 0.0001) {
           prev = ((double.parse(prev)).round()).toString();
         }
       }
@@ -307,7 +305,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
 
       body:
-    Container(color: backgroundColor, child:
+    AnimatedContainer(duration: const Duration(milliseconds: 200), color: backgroundColor, child:
     Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
