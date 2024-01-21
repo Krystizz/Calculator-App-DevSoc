@@ -51,11 +51,11 @@ class _MyHomePageState extends State<MyHomePage> {
   Color appbarColor = Colors.deepOrange.shade800;
   IconData themeIcon = Icons.dark_mode;
 
-  var style1 = ElevatedButton.styleFrom(backgroundColor: Colors.red.shade400, foregroundColor: Colors.white,
+  var style1 = ElevatedButton.styleFrom(backgroundColor: Colors.red.shade500, foregroundColor: Colors.white,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),);
-  var style2 = ElevatedButton.styleFrom(backgroundColor: Colors.deepOrange.shade300, foregroundColor: Colors.white,
+  var style2 = ElevatedButton.styleFrom(backgroundColor: Colors.deepOrange.shade500, foregroundColor: Colors.white,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),);
-  var style3 = ElevatedButton.styleFrom(backgroundColor: Colors.deepOrange.shade50, foregroundColor: Colors.deepOrange.shade900,
+  var style3 = ElevatedButton.styleFrom(backgroundColor: Colors.deepOrange.shade300, foregroundColor: Colors.white,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),);
 
   void _backspace(){
@@ -71,9 +71,9 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       ans = '';
       prev = '';
+      oper = '';
       num1 = 0.0;
       num2 = 0.0;
-      oper = '';
       justcalc = false;
     });
   }
@@ -167,7 +167,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _changesign(){
     setState(() {
-      temp = double.parse(ans) * (-1);
+      temp = double.parse(ans) * (-1.0);
       ans = temp.toString();
       _checkifint();
       justcalc == false;
@@ -177,9 +177,9 @@ class _MyHomePageState extends State<MyHomePage> {
   void _percentage(){
     setState(() {
       temp = double.parse(ans) / 100.0;
-      justcalc == true;
       ans = temp.toString();
       _checkifint();
+      justcalc == true;
     });
   }
 
@@ -188,7 +188,7 @@ class _MyHomePageState extends State<MyHomePage> {
       if (justcalc == true) {
         _clear();
       }
-      if (k == 'pi') {
+      if (k == 'π') {
         ans = '3.14159';
         justcalc == false;
       }
@@ -201,8 +201,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _square() {
     setState(() {
-      temp = double.parse(ans) * double.parse(ans);
-      ans = temp.toString();
+      temp = double.parse(ans);
+      ans = (temp * temp).toString();
       _checkifint();
       justcalc == true;
     });
@@ -210,8 +210,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _cube() {
     setState(() {
-      temp = double.parse(ans) * double.parse(ans) * double.parse(ans);
-      ans = temp.toString();
+      temp = double.parse(ans);
+      ans = (temp * temp * temp).toString();
       _checkifint();
       justcalc == true;
     });
@@ -219,18 +219,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _checkifint(){
     setState(() {
-      if ((double.parse(ans) - ((double.parse(ans)).round()).toDouble()).abs() <= 0.0001) {
-        ans = ((double.parse(ans)).round()).toString();
+      temp = double.parse(ans);
+      if (temp.abs() >= 1e8 || temp.abs() <= 1e-8) {
+        ans = temp.toStringAsExponential();
       }
-      if (prev.isNotEmpty) {
-        if ((double.parse(prev) - ((double.parse(prev)).round()).toDouble()).abs() <= 0.0001) {
+      if ((temp - (temp.round()).toDouble()).abs() <= 0.000000001) {
+        ans = (temp.round()).toString();
+      }
+      temp = double.parse(prev);
+      if (prev.isNotEmpty && (temp - (temp.round()).toDouble()).abs() <= 0.000000001) {
           prev = ((double.parse(prev)).round()).toString();
-        }
       }
     });
   }
-
-  void _nullfunction() {}
 
   void _darkTheme() {
     setState(() {
@@ -240,7 +241,6 @@ class _MyHomePageState extends State<MyHomePage> {
         textboxColor = Colors.white70;
         appbarColor = Colors.black;
         themeIcon = Icons.light_mode;
-
         style1 = ElevatedButton.styleFrom(
           backgroundColor: Colors.cyan.shade900, foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
@@ -262,19 +262,18 @@ class _MyHomePageState extends State<MyHomePage> {
         textboxColor = Colors.white;
         appbarColor = Colors.deepOrange.shade800;
         themeIcon = Icons.dark_mode;
-
         style1 = ElevatedButton.styleFrom(
-          backgroundColor: Colors.red.shade400, foregroundColor: Colors.white,
+          backgroundColor: Colors.red.shade500, foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20)),);
         style2 = ElevatedButton.styleFrom(
-          backgroundColor: Colors.deepOrange.shade300,
+          backgroundColor: Colors.deepOrange.shade500,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20)),);
         style3 = ElevatedButton.styleFrom(
-          backgroundColor: Colors.deepOrange.shade50,
-          foregroundColor: Colors.deepOrange.shade900,
+          backgroundColor: Colors.deepOrange.shade300,
+          foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20)),);
       }
@@ -286,8 +285,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    FittedBox textstyle(String txt) {
-      return FittedBox(fit: BoxFit.scaleDown, child: Text(txt, style: const TextStyle(fontSize: 40),),);
+    SizedBox uiButton(double x, double y, ButtonStyle style, void Function() func, String txt) {
+      return SizedBox(width: screenWidth*x, height: screenHeight*y, child:
+      ElevatedButton(style: style, onPressed: func, child:
+      FittedBox(fit: BoxFit.scaleDown, child: Text(txt, style: const TextStyle(fontSize: 40),),),),);
     }
 
     return Scaffold(
@@ -305,95 +306,70 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
 
       body:
-    AnimatedContainer(duration: const Duration(milliseconds: 200), color: backgroundColor, child:
+    Container(color: backgroundColor, child:
     Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           SizedBox(width: screenWidth*0.975, height: screenHeight*0.07, child: OutlinedButton(style: TextButton.styleFrom
-            (shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)), backgroundColor: textboxColor), onPressed: _nullfunction,
+            (shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)), backgroundColor: textboxColor), onPressed: null,
             child: Text(prev, style: Theme.of(context).textTheme.headlineSmall,),),),
           SizedBox(width: screenWidth*0.975, height: screenHeight*0.07, child: OutlinedButton(style: TextButton.styleFrom
-            (shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)), backgroundColor: textboxColor), onPressed: _nullfunction,
+            (shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)), backgroundColor: textboxColor), onPressed: null,
             child: Text(ans, style: Theme.of(context).textTheme.headlineSmall,),),),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style1, onPressed: _clear , child: textstyle('C'),),),
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style2, onPressed: _square , child: textstyle('x²'),),),
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style2, onPressed: _cube , child: textstyle('x³'),),),
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style1,  onPressed: _backspace , child:
-                    const FittedBox(fit: BoxFit.scaleDown, child: Icon(Icons.backspace),),),),
+                  uiButton(0.18, 0.085, style1, _clear, 'C'),
+                  uiButton(0.18, 0.085, style2, _square, 'x²'),
+                  uiButton(0.18, 0.085, style2, _cube, 'x³'),
+                  uiButton(0.18, 0.085, style1, _backspace, '⌫'),
                 ],
               ),
               SizedBox(height: screenHeight*0.02),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style2, onPressed: _percentage , child: textstyle('%'),),),
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style2, onPressed: (){_constants('e');} , child: textstyle('e'),),),
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style2, onPressed: (){_constants('pi');} , child: textstyle('π'),),),
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style2,  onPressed: (){_operclicked('+');} , child: textstyle('+'),),),
+                  uiButton(0.18, 0.085, style2, _percentage, '%'),
+                  uiButton(0.18, 0.085, style2, (){_constants('e');}, 'e'),
+                  uiButton(0.18, 0.085, style2, (){_constants('π');}, 'π'),
+                  uiButton(0.18, 0.085, style2, (){_operclicked('+');}, '+'),
                 ],
               ),
               SizedBox(height: screenHeight*0.02),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style3, onPressed: (){_numClicked('7');} , child: textstyle('7'),),),
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style3, onPressed: (){_numClicked('8');} , child: textstyle('8'),),),
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style3, onPressed: (){_numClicked('9');} , child: textstyle('9'),),),
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style2,  onPressed: (){_operclicked('-');} , child: textstyle('-'),),),
+                  uiButton(0.18, 0.085, style3, (){_numClicked('7');}, '7'),
+                  uiButton(0.18, 0.085, style3, (){_numClicked('8');}, '8'),
+                  uiButton(0.18, 0.085, style3, (){_numClicked('9');}, '9'),
+                  uiButton(0.18, 0.085, style2, (){_operclicked('-');}, '-'),
                 ],
               ),
               SizedBox(height: screenHeight*0.02),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style3, onPressed: (){_numClicked('4');} , child: textstyle('4'),),),
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style3, onPressed: (){_numClicked('5');} , child: textstyle('5'),),),
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style3, onPressed: (){_numClicked('6');} , child: textstyle('6'),),),
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style2,  onPressed: (){_operclicked('x');} , child: textstyle('x'),),),
+                  uiButton(0.18, 0.085, style3, (){_numClicked('4');}, '4'),
+                  uiButton(0.18, 0.085, style3, (){_numClicked('5');}, '5'),
+                  uiButton(0.18, 0.085, style3, (){_numClicked('6');}, '6'),
+                  uiButton(0.18, 0.085, style2, (){_operclicked('x');}, 'x'),
                 ],
               ),
               SizedBox(height: screenHeight*0.02),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style3, onPressed: (){_numClicked('1');} , child: textstyle('1'),),),
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style3, onPressed: (){_numClicked('2');} , child: textstyle('2'),),),
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style3, onPressed: (){_numClicked('3');} , child: textstyle('3'),),),
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style2,  onPressed: (){_operclicked('÷');} , child: textstyle('÷'),),),
+                  uiButton(0.18, 0.085, style3, (){_numClicked('1');}, '1'),
+                  uiButton(0.18, 0.085, style3, (){_numClicked('2');}, '2'),
+                  uiButton(0.18, 0.085, style3, (){_numClicked('3');}, '3'),
+                  uiButton(0.18, 0.085, style2, (){_operclicked('÷');}, '÷'),
                 ],
               ),
               SizedBox(height: screenHeight*0.02),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style2, onPressed: _changesign , child: textstyle('±'),),),
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style3, onPressed: (){_numClicked('0');} , child: textstyle('0'),),),
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style2, onPressed: (){_numClicked('.');} , child: textstyle('.'),),),
-                  SizedBox(width: screenWidth*0.18, height: screenHeight*0.085, child:
-                  ElevatedButton(style: style1,  onPressed: _calculate ,child: textstyle('='),),),
+                  uiButton(0.18, 0.085, style2, _changesign, '±'),
+                  uiButton(0.18, 0.085, style3, (){_numClicked('0');}, '0'),
+                  uiButton(0.18, 0.085, style2, (){_numClicked('.');}, '.'),
+                  uiButton(0.18, 0.085, style1, _calculate, '='),
                 ],
               ),
             ],),
