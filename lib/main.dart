@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
-import 'login_page.dart';
+import 'login.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,10 +35,10 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  MyHomePage({super.key, required this.title});
 
   final String title;
-  // final user = FirebaseAuth.instance.currentUser!;
+  final User? userID = FirebaseAuth.instance.currentUser;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -47,29 +47,37 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
 
   String ans = '';
-  String prev = '';
+  String prevNum = '';
+  String newNum = '';
   String oper = '';
+  String history = '';
+
   double num1 = 0.0;
   double num2 = 0.0;
   double temp = 0.0;
+  
   bool shouldClear = false;
-
   bool darkEnabled = false;
+
   Color textBoxColor = Colors.white;
   Color backgroundColor = Colors.white;
   Color appBarColor = Colors.deepOrange.shade800;
   IconData themeIcon = Icons.dark_mode;
 
-  var style1 = ElevatedButton.styleFrom(backgroundColor: Colors.red.shade500, foregroundColor: Colors.white,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),);
-  var style2 = ElevatedButton.styleFrom(backgroundColor: Colors.deepOrange.shade500, foregroundColor: Colors.white,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),);
-  var style3 = ElevatedButton.styleFrom(backgroundColor: Colors.deepOrange.shade300, foregroundColor: Colors.white,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),);
+  var style1 = ElevatedButton.styleFrom(backgroundColor: Colors.red.shade500,
+  foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius:
+  BorderRadius.circular(20)),);
+  var style2 = ElevatedButton.styleFrom(backgroundColor: Colors.deepOrange.shade500,
+  foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius:
+  BorderRadius.circular(20)),);
+  var style3 = ElevatedButton.styleFrom(backgroundColor: Colors.deepOrange.shade300,
+  foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius:
+  BorderRadius.circular(20)),);
 
-  void addUserHistory() async {
-    await FirebaseFirestore.instance.collection('users').add({
-      
+  void addUserHistory(String history) async {
+    await FirebaseFirestore.instance.collection(widget.userID!.email.toString()).add({
+      'history': history,
+      'time': DateTime.now(),
     });
   }
 
@@ -85,8 +93,10 @@ class _MyHomePageState extends State<MyHomePage> {
   void clear() {
     setState(() {
       ans = '';
-      prev = '';
+      prevNum = '';
+      newNum = '';
       oper = '';
+      history = '';
       num1 = 0.0;
       num2 = 0.0;
       shouldClear = false;
@@ -100,24 +110,12 @@ class _MyHomePageState extends State<MyHomePage> {
         num2 = double.parse(ans);
         if (oper == '+') {
           ans = (num1 + num2).toString();
-          prev = num1.toString();
-          num1 = 0.0;
-          num2 = 0.0;
-          oper = '';
         }
         else if (oper == '-') {
           ans = (num1 - num2).toString();
-          prev = num1.toString();
-          num1 = 0.0;
-          num2 = 0.0;
-          oper = '';
         }
         else if (oper == 'x') {
           ans = (num1 * num2).toString();
-          prev = num1.toString();
-          num1 = 0.0;
-          num2 = 0.0;
-          oper = '';
         }
         else if (oper == '÷') {
           if (num2 == 0) {
@@ -125,13 +123,15 @@ class _MyHomePageState extends State<MyHomePage> {
           }
           else {
             ans = (num1 / num2).toString();
-            prev = num1.toString();
-            num1 = 0.0;
-            num2 = 0.0;
-            oper = '';
           }
         }
+        prevNum = num1.toString();
+        newNum = num2.toString();
         setPrecision();
+        history = '$prevNum $oper $newNum = $ans';
+        num1 = 0.0;
+        num2 = 0.0;
+        oper = '';
       }
       else {
         shouldClear = false;
@@ -159,11 +159,11 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       shouldClear = false;
       if (ans.isNotEmpty) {
-        prev = ans;
+        prevNum = ans;
         if (oper != '') {
           calculate();
           shouldClear = false;
-          prev = ans;
+          prevNum = ans;
           num1 = double.parse(ans);
           ans = '';
           oper = ope;
@@ -177,6 +177,7 @@ class _MyHomePageState extends State<MyHomePage> {
       else if (ans.isEmpty) {
         oper = ope;
       }
+      history = prevNum;
     });
   }
 
@@ -217,79 +218,87 @@ class _MyHomePageState extends State<MyHomePage> {
   void square() {
     setState(() {
       temp = double.parse(ans);
+      prevNum = ans;
       ans = (temp * temp).toString();
       setPrecision();
       shouldClear == true;
+      history = '$prevNum ^ 2';
     });
   }
 
   void cube() {
     setState(() {
       temp = double.parse(ans);
+      prevNum = ans;
       ans = (temp * temp * temp).toString();
       setPrecision();
       shouldClear == true;
+      history = '$prevNum ^ 3';
     });
   }
 
   void setPrecision(){
     setState(() {
-      temp = double.parse(ans);
-      if ((temp - (temp.round()).toDouble()).abs() < 1e-12) {
-        ans = (temp.round()).toString();
+      if (ans.isNotEmpty)
+      {
+        temp = double.parse(ans);
+        if ((temp - (temp.round()).toDouble()).abs() < 1e-12) {
+          ans = (temp.round()).toString();
+        }
       }
-      temp = double.parse(prev);
-      if (prev.isNotEmpty && (temp - (temp.round()).toDouble()).abs() < 1e-12) {
-          prev = ((double.parse(prev)).round()).toString();
+      if (prevNum.isNotEmpty)
+      {
+        temp = double.parse(prevNum);
+        if (prevNum.isNotEmpty && (temp - (temp.round()).toDouble()).abs() < 1e-12) {
+            prevNum = ((double.parse(prevNum)).round()).toString();
+        }
+      }
+      if (newNum.isNotEmpty)
+      {
+        temp = double.parse(newNum);
+        if (newNum.isNotEmpty && (temp - (temp.round()).toDouble()).abs() < 1e-12) {
+            newNum = ((double.parse(newNum)).round()).toString();
+        }
       }
       ans = ans.toString();
-      prev = prev.toString();
+      prevNum = prevNum.toString();
+      newNum = newNum.toString();
     });
   }
 
   void darkTheme() {
     setState(() {
       if (!darkEnabled) {
-        backgroundColor = Colors.black;
         darkEnabled = true;
+        backgroundColor = Colors.black;
         textBoxColor = Colors.white70;
         appBarColor = Colors.black;
         themeIcon = Icons.light_mode;
         style1 = ElevatedButton.styleFrom(
           backgroundColor: Colors.cyan.shade900, foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20)),);
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),);
         style2 = ElevatedButton.styleFrom(
-          backgroundColor: Colors.blueGrey.shade600,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20)),);
+          backgroundColor: Colors.blueGrey.shade600, foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),);
         style3 = ElevatedButton.styleFrom(
-          backgroundColor: Colors.blueGrey.shade900,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20)),);
+          backgroundColor: Colors.blueGrey.shade900, foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),);
       }
       else {
-        backgroundColor = Colors.white;
         darkEnabled = false;
+        backgroundColor = Colors.white;
         textBoxColor = Colors.white;
         appBarColor = Colors.deepOrange.shade800;
         themeIcon = Icons.dark_mode;
         style1 = ElevatedButton.styleFrom(
           backgroundColor: Colors.red.shade500, foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20)),);
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),);
         style2 = ElevatedButton.styleFrom(
-          backgroundColor: Colors.deepOrange.shade500,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20)),);
+          backgroundColor: Colors.deepOrange.shade500, foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),);
         style3 = ElevatedButton.styleFrom(
-          backgroundColor: Colors.deepOrange.shade300,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20)),);
+          backgroundColor: Colors.deepOrange.shade300, foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),);
       }
     });
   }
@@ -303,31 +312,34 @@ class _MyHomePageState extends State<MyHomePage> {
 
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    SizedBox uiButton(double x, double y, ButtonStyle style, void Function() func, String txt) {
-      return SizedBox(width: screenWidth*x, height: screenHeight*y, child:
-      ElevatedButton(style: style, onPressed: func, child:
-      FittedBox(fit: BoxFit.scaleDown, child: Text(txt, style: const TextStyle(fontSize: 40),),),),);
+
+    SizedBox uiButton(double x, double y, ButtonStyle style,
+      void Function() func, String txt) {
+        return SizedBox(width: screenWidth*x, height: screenHeight*y, child:
+          ElevatedButton(style: style, onPressed: func, child:
+            FittedBox(fit: BoxFit.scaleDown, child: Text(txt,
+              style: const TextStyle(fontSize: 40),),),),);
     }
 
     return Scaffold(
-      appBar: AppBar( foregroundColor: Colors.white,
-        backgroundColor: appBarColor,
-        title: Text(widget.title),centerTitle: true,
+      appBar: AppBar(
+        foregroundColor: Colors.white, backgroundColor: appBarColor,
+        title: Text(widget.title), centerTitle: true,
         actions: <Widget>[
-          IconButton(
-            icon: Icon(themeIcon),
-            onPressed: () {
+          IconButton(icon: Icon(themeIcon), onPressed: () {
               setState(() {
                 darkTheme();
               });
             },),
-            IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
+            IconButton(icon: const Icon(Icons.logout), onPressed: () {
               setState(() {
                 signUserOut();
               });
-            },)
+            },),
+            IconButton(icon: const Icon(Icons.history), onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(builder:
+              (context) => HistoryPage()));
+            },),
             ],
       ),
 
@@ -336,12 +348,17 @@ class _MyHomePageState extends State<MyHomePage> {
     Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-          SizedBox(width: screenWidth*0.975, height: screenHeight*0.07, child: OutlinedButton(style: TextButton.styleFrom
-            (shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)), backgroundColor: textBoxColor), onPressed: null,
-            child: Text(prev, style: Theme.of(context).textTheme.headlineSmall,),),),
-          SizedBox(width: screenWidth*0.975, height: screenHeight*0.07, child: OutlinedButton(style: TextButton.styleFrom
-            (shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)), backgroundColor: textBoxColor), onPressed: null,
-            child: Text(ans, style: Theme.of(context).textTheme.headlineSmall,),),),
+          SizedBox(width: screenWidth*0.975, height: screenHeight*0.07, child:
+            OutlinedButton(style: TextButton.styleFrom(shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                backgroundColor: textBoxColor), onPressed: null, child:
+                  Text(history.split(' = ')[0], style:
+                    Theme.of(context).textTheme.headlineSmall,),),),
+          SizedBox(width: screenWidth*0.975, height: screenHeight*0.07, child:
+            OutlinedButton(style: TextButton.styleFrom(shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                backgroundColor: textBoxColor), onPressed: null, child:
+                  Text(ans, style: Theme.of(context).textTheme.headlineSmall,),),),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -395,13 +412,62 @@ class _MyHomePageState extends State<MyHomePage> {
                   uiButton(0.18, 0.085, style2, changeSign, '±'),
                   uiButton(0.18, 0.085, style3, (){numClicked('0');}, '0'),
                   uiButton(0.18, 0.085, style2, (){numClicked('.');}, '.'),
-                  uiButton(0.18, 0.085, style1, calculate, '='),
+                  uiButton(0.18, 0.085, style1, (){
+                    calculate();
+                    if (prevNum.isNotEmpty) {
+                      addUserHistory(history);
+                    }
+                  }, '='),
                 ],
               ),
             ],),
         ],
       ),
     ),
+    );
+  }
+}
+
+class HistoryPage extends StatelessWidget {
+  HistoryPage({super.key});
+
+  final User? userID = FirebaseAuth.instance.currentUser;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        foregroundColor: Colors.white,
+        backgroundColor: Colors.deepOrange.shade800,
+        title: const Text('History'),
+        centerTitle: true,
+      ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection(userID!.email.toString()).
+          orderBy('time', descending: true).snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return ListView.builder(
+              itemCount: snapshot.data!.docs.length,
+              itemBuilder: (context, index) {
+                final doc = snapshot.data!.docs[index];
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child:
+                    ListTile(
+                      title: Text(doc['history'], style:
+                        Theme.of(context).textTheme.headlineSmall,),
+                      visualDensity: VisualDensity.standard,
+                      tileColor: Colors.grey[200],
+                    ),
+                );
+              },
+            );
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
     );
   }
 }

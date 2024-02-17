@@ -1,6 +1,6 @@
+import 'main.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:calculator/main.dart';
 
 class AuthPage extends StatelessWidget {
   const AuthPage({super.key});
@@ -12,7 +12,7 @@ class AuthPage extends StatelessWidget {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return const MyHomePage(title : 'Calculator');
+            return MyHomePage(title : 'Calculator');
           }
           else {
             return const LoginPage();
@@ -155,9 +155,11 @@ class _LoginPageState extends State<LoginPage> {
                   child: Container(
                     padding: const EdgeInsets.all(25),
                     margin: const EdgeInsets.symmetric(horizontal: 25),
-                    decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(8),),
-                    child: const Center(child: Text("Sign In",
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16,),
+                    decoration: BoxDecoration(color: Colors.black,
+                      borderRadius: BorderRadius.circular(8),),
+                      child: const Center(child: Text("Sign In",
+                        style: TextStyle(color: Colors.white,
+                          fontWeight: FontWeight.bold, fontSize: 16,),
                     ),),),),
                 const SizedBox(height: 20),
 
@@ -166,9 +168,11 @@ class _LoginPageState extends State<LoginPage> {
                   child: Container(
                     padding: const EdgeInsets.all(25),
                     margin: const EdgeInsets.symmetric(horizontal: 25),
-                    decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(8),),
-                    child: const Center(child: Text("Sign Up",
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16,),
+                    decoration: BoxDecoration(color: Colors.black,
+                      borderRadius: BorderRadius.circular(8),),
+                      child: const Center(child: Text("Sign Up",
+                        style: TextStyle(color: Colors.white,
+                          fontWeight: FontWeight.bold, fontSize: 16,),
                     ),),),),
               ],
             ),
