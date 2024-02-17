@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'login_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
+  await Firebase.initializeApp(
+  options: DefaultFirebaseOptions.currentPlatform,
+);
   runApp(const MyApp());
 }
 
@@ -21,7 +28,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         scaffoldBackgroundColor: Colors.white,
         ),
-      home: const MyHomePage(title: 'Calculator'),
+      home: const AuthPage(),
     );
   }
 }
@@ -30,6 +37,7 @@ class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
   final String title;
+  // final user = FirebaseAuth.instance.currentUser!;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -116,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
             oper = '';
           }
         }
-        _checkifint();
+        _setprecision();
       }
       else {
         justcalc = false;
@@ -169,7 +177,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       temp = double.parse(ans) * (-1.0);
       ans = temp.toString();
-      _checkifint();
+      _setprecision();
       justcalc == false;
     });
   }
@@ -178,7 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       temp = double.parse(ans) / 100.0;
       ans = temp.toString();
-      _checkifint();
+      _setprecision();
       justcalc == true;
     });
   }
@@ -203,7 +211,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       temp = double.parse(ans);
       ans = (temp * temp).toString();
-      _checkifint();
+      _setprecision();
       justcalc == true;
     });
   }
@@ -212,24 +220,23 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       temp = double.parse(ans);
       ans = (temp * temp * temp).toString();
-      _checkifint();
+      _setprecision();
       justcalc == true;
     });
   }
 
-  void _checkifint(){
+  void _setprecision(){
     setState(() {
       temp = double.parse(ans);
-      if (temp.abs() >= 1e8 || temp.abs() <= 1e-8) {
-        ans = temp.toStringAsExponential();
-      }
-      if ((temp - (temp.round()).toDouble()).abs() <= 0.000000001) {
+      if ((temp - (temp.round()).toDouble()).abs() < 1e-12) {
         ans = (temp.round()).toString();
       }
       temp = double.parse(prev);
-      if (prev.isNotEmpty && (temp - (temp.round()).toDouble()).abs() <= 0.000000001) {
+      if (prev.isNotEmpty && (temp - (temp.round()).toDouble()).abs() < 1e-12) {
           prev = ((double.parse(prev)).round()).toString();
       }
+      ans = ans.toString();
+      prev = prev.toString();
     });
   }
 
@@ -280,6 +287,10 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void _signout() {
+    FirebaseAuth.instance.signOut();
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -302,7 +313,15 @@ class _MyHomePageState extends State<MyHomePage> {
               setState(() {
                 _darkTheme();
               });
-            },),],
+            },),
+            IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              setState(() {
+                _signout();
+              });
+            },)
+            ],
       ),
 
       body:

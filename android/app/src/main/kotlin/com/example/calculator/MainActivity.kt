@@ -1,4 +1,4 @@
-package com.example.calculator
+package com.astrogenz.calculator
 
 import io.flutter.embedding.android.FlutterActivity
 
