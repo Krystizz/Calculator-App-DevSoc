@@ -13,7 +13,7 @@ class AuthPage extends StatelessWidget {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return MyHomePage(title : 'Calculator');
+            return MyHomePage();
           }
           else {
             return const LoginPage();
@@ -54,10 +54,10 @@ class _LoginPageState extends State<LoginPage> {
       email: emailController.text,
       password: passwordController.text,
     );
-    if (mounted) {Navigator.pop(context);}
+    if (mounted) Navigator.pop(context);
     }
     on FirebaseAuthException catch (e) {
-      if (mounted) {Navigator.pop(context);}
+      if (mounted) Navigator.pop(context);
       showErrorMessage(e.code);
     }
   }
@@ -71,10 +71,10 @@ class _LoginPageState extends State<LoginPage> {
       email: emailController.text,
       password: passwordController.text,
     );
-    if (mounted) {Navigator.pop(context);}
+    if (mounted) Navigator.pop(context);
     }
     on FirebaseAuthException catch (e) {
-      if (mounted) {Navigator.pop(context);}
+      if (mounted) Navigator.pop(context);
       showErrorMessage(e.code);
     }
   }
@@ -85,7 +85,7 @@ class _LoginPageState extends State<LoginPage> {
         globals.darkEnabled = true;
         globals.backgroundColor = Colors.black;
         globals.textColor = Colors.white;
-        globals.textBoxColor = Colors.white70;
+        globals.textBoxColor = Colors.grey.shade900;
         globals.appBarColor = Colors.black;
         globals.themeIcon = Icons.light_mode;
         globals.style1 = ElevatedButton.styleFrom(
@@ -102,7 +102,7 @@ class _LoginPageState extends State<LoginPage> {
         globals.darkEnabled = false;
         globals.backgroundColor = Colors.white;
         globals.textColor = Colors.black;
-        globals.textBoxColor = Colors.white;
+        globals.textBoxColor = Colors.grey.shade200;
         globals.appBarColor = Colors.deepOrange.shade800;
         globals.themeIcon = Icons.dark_mode;
         globals.style1 = ElevatedButton.styleFrom(
@@ -154,14 +154,14 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(height: screenHeight*0.05),
                 Text(
                   'Welcome!',
-                  style: TextStyle(color: globals.textColor, fontSize: 28,),
+                  style: TextStyle(color: globals.textColor, fontSize: 25,),
                   ),
                 SizedBox(height: screenHeight*0.02),
                 Text(
                   'Sign in or sign up with your details!',
                   style: TextStyle(
                     color: globals.textColor,
-                    fontSize: 20,
+                    fontSize: 18,
                   ),
                 ),
                 SizedBox(height: screenHeight*0.05),
@@ -170,6 +170,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: TextField(
                           controller: emailController,
                           obscureText: false,
+                          style: TextStyle(color: globals.textColor),
                           decoration: InputDecoration(
                               enabledBorder: const OutlineInputBorder(
                                 borderSide: BorderSide(color: Colors.white),
@@ -177,10 +178,10 @@ class _LoginPageState extends State<LoginPage> {
                               focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(color: Colors.grey.shade400),
                               ),
-                              fillColor: Colors.grey.shade200,
+                              fillColor: globals.textBoxColor,
                               filled: true,
                               hintText: 'Email',
-                              hintStyle: TextStyle(color: Colors.grey[600])),
+                              hintStyle: TextStyle(color: Colors.grey.shade500)),
                         ),
                 ),
                 SizedBox(height: screenHeight*0.02),
@@ -189,6 +190,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: TextField(
                           controller: passwordController,
                           obscureText: true,
+                          style: TextStyle(color: globals.textColor),
                           decoration: InputDecoration(
                               enabledBorder: const OutlineInputBorder(
                                 borderSide: BorderSide(color: Colors.white),
@@ -196,16 +198,16 @@ class _LoginPageState extends State<LoginPage> {
                               focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(color: Colors.grey.shade400),
                               ),
-                              fillColor: Colors.grey.shade200,
+                              fillColor: globals.textBoxColor,
                               filled: true,
                               hintText: 'Password',
-                              hintStyle: TextStyle(color: Colors.grey[600])),
+                              hintStyle: TextStyle(color: Colors.grey.shade500)),
                         ),
                 ),
                 SizedBox(height: screenHeight*0.05),
-                uiButton(0.6, 0.08, globals.style1, signUserIn, 'Sign In'),
+                uiButton(0.5, 0.05, globals.style1, signUserIn, 'Sign In'),
                 SizedBox(height: screenHeight*0.02),
-                uiButton(0.6, 0.08, globals.style1, signUserUp, 'Sign Up'),
+                uiButton(0.5, 0.05, globals.style1, signUserUp, 'Sign Up'),
                 SizedBox(height: screenHeight*0.08),
                 ]),
             ),

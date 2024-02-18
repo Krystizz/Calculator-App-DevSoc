@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 bool darkEnabled = false;
 Color textColor = Colors.black;
-Color textBoxColor = Colors.white;
+Color textBoxColor = Colors.grey.shade200;
 Color backgroundColor = Colors.white;
 Color appBarColor = Colors.deepOrange.shade800;
 IconData themeIcon = Icons.dark_mode;

@@ -36,11 +36,10 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({super.key, required this.title});
+  MyHomePage({super.key});
 
-  final String title;
-  final User? userID = FirebaseAuth.instance.currentUser;
-
+  final String? userID = FirebaseAuth.instance.currentUser!.email;
+  
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -58,9 +57,10 @@ class _MyHomePageState extends State<MyHomePage> {
   double temp = 0.0;
   
   bool shouldClear = false;
+  
 
   void save(String lastCalc) async {
-    await FirebaseFirestore.instance.collection(widget.userID!.email.toString()).add({
+    await FirebaseFirestore.instance.collection(widget.userID!).add({
       'calc': lastCalc,
       'time': DateTime.now(),
     });
@@ -95,12 +95,24 @@ class _MyHomePageState extends State<MyHomePage> {
         num2 = double.parse(ans);
         if (oper == '+') {
           ans = (num1 + num2).toString();
+          prevNum = num1.toString();
+          newNum = num2.toString();
+          setPrecision();
+          lastCalc = '$prevNum $oper $newNum = $ans';
         }
         else if (oper == '-') {
           ans = (num1 - num2).toString();
+          prevNum = num1.toString();
+          newNum = num2.toString();
+          setPrecision();
+          lastCalc = '$prevNum $oper $newNum = $ans';
         }
         else if (oper == 'x') {
           ans = (num1 * num2).toString();
+          prevNum = num1.toString();
+          newNum = num2.toString();
+          setPrecision();
+          lastCalc = '$prevNum $oper $newNum = $ans';
         }
         else if (oper == '÷') {
           if (num2 == 0) {
@@ -108,12 +120,12 @@ class _MyHomePageState extends State<MyHomePage> {
           }
           else {
             ans = (num1 / num2).toString();
+            prevNum = num1.toString();
+            newNum = num2.toString();
+            setPrecision();
+            lastCalc = '$prevNum $oper $newNum = $ans';
           }
         }
-        prevNum = num1.toString();
-        newNum = num2.toString();
-        setPrecision();
-        lastCalc = '$prevNum $oper $newNum = $ans';
         num1 = 0.0;
         num2 = 0.0;
         oper = '';
@@ -178,9 +190,11 @@ class _MyHomePageState extends State<MyHomePage> {
   void percentage(){
     setState(() {
       temp = double.parse(ans) / 100.0;
+      prevNum = ans;
       ans = temp.toString();
       setPrecision();
       shouldClear == true;
+      lastCalc = '$prevNum% = $ans';
     });
   }
 
@@ -207,7 +221,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ans = (temp * temp).toString();
       setPrecision();
       shouldClear == true;
-      lastCalc = '$prevNum ^ 2';
+      lastCalc = '$prevNum ^ 2 = $ans';
     });
   }
 
@@ -218,7 +232,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ans = (temp * temp * temp).toString();
       setPrecision();
       shouldClear == true;
-      lastCalc = '$prevNum ^ 3';
+      lastCalc = '$prevNum ^ 3 = $ans';
     });
   }
 
@@ -257,7 +271,7 @@ class _MyHomePageState extends State<MyHomePage> {
         globals.darkEnabled = true;
         globals.backgroundColor = Colors.black;
         globals.textColor = Colors.white;
-        globals.textBoxColor = Colors.white70;
+        globals.textBoxColor = Colors.grey.shade900;
         globals.appBarColor = Colors.black;
         globals.themeIcon = Icons.light_mode;
         globals.style1 = ElevatedButton.styleFrom(
@@ -274,7 +288,7 @@ class _MyHomePageState extends State<MyHomePage> {
         globals.darkEnabled = false;
         globals.backgroundColor = Colors.white;
         globals.textColor = Colors.black;
-        globals.textBoxColor = Colors.white;
+        globals.textBoxColor = Colors.grey.shade200;
         globals.appBarColor = Colors.deepOrange.shade800;
         globals.themeIcon = Icons.dark_mode;
         globals.style1 = ElevatedButton.styleFrom(
@@ -334,17 +348,17 @@ class _MyHomePageState extends State<MyHomePage> {
     Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-          SizedBox(width: screenWidth*0.975, height: screenHeight*0.07, child:
+          SizedBox(width: screenWidth*0.92, height: screenHeight*0.07, child:
             OutlinedButton(style: TextButton.styleFrom(shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                 backgroundColor: globals.textBoxColor), onPressed: null, child:
                   Text(lastCalc.split(' = ')[0], style:
-                    Theme.of(context).textTheme.headlineSmall,),),),
-          SizedBox(width: screenWidth*0.975, height: screenHeight*0.07, child:
+                    TextStyle(fontSize: 25, color: globals.textColor)),),),
+          SizedBox(width: screenWidth*0.92, height: screenHeight*0.07, child:
             OutlinedButton(style: TextButton.styleFrom(shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                 backgroundColor: globals.textBoxColor), onPressed: null, child:
-                  Text(ans, style: Theme.of(context).textTheme.headlineSmall,),),),
+                  Text(ans, style: TextStyle(fontSize: 25, color: globals.textColor)),),),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -417,20 +431,29 @@ class _MyHomePageState extends State<MyHomePage> {
 class HistoryPage extends StatelessWidget {
   HistoryPage({super.key});
 
-  final User? userID = FirebaseAuth.instance.currentUser;
+  final String? userID = FirebaseAuth.instance.currentUser!.email;
+
+  void clearHistory() {
+    FirebaseFirestore.instance.collection(userID!).get().then((snapshot) {
+      for (DocumentSnapshot ds in snapshot.docs){ds.reference.delete();}
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
-        backgroundColor: (!globals.darkEnabled)? Colors.deepOrange.shade800 : Colors.black,
+        backgroundColor: globals.appBarColor,
         title: const Text('History'),
         centerTitle: true,
+        actions: <Widget>[
+          IconButton(icon: const Icon(Icons.delete), onPressed: () {clearHistory();}),
+        ],
       ),
       body: Container(color: globals.backgroundColor,
         child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance.collection(userID!.email.toString()).
+          stream: FirebaseFirestore.instance.collection(userID!).
             orderBy('time', descending: true).snapshots(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
