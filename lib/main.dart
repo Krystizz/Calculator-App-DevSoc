@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'login.dart';
+import 'globals.dart' as globals;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,8 +13,8 @@ void main() async {
     DeviceOrientation.portraitUp,
   ]);
   await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.currentPlatform,
-);
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -50,33 +51,17 @@ class _MyHomePageState extends State<MyHomePage> {
   String prevNum = '';
   String newNum = '';
   String oper = '';
-  String history = '';
+  String lastCalc = '';
 
   double num1 = 0.0;
   double num2 = 0.0;
   double temp = 0.0;
   
   bool shouldClear = false;
-  bool darkEnabled = false;
 
-  Color textBoxColor = Colors.white;
-  Color backgroundColor = Colors.white;
-  Color appBarColor = Colors.deepOrange.shade800;
-  IconData themeIcon = Icons.dark_mode;
-
-  var style1 = ElevatedButton.styleFrom(backgroundColor: Colors.red.shade500,
-  foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius:
-  BorderRadius.circular(20)),);
-  var style2 = ElevatedButton.styleFrom(backgroundColor: Colors.deepOrange.shade500,
-  foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius:
-  BorderRadius.circular(20)),);
-  var style3 = ElevatedButton.styleFrom(backgroundColor: Colors.deepOrange.shade300,
-  foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius:
-  BorderRadius.circular(20)),);
-
-  void addUserHistory(String history) async {
+  void save(String lastCalc) async {
     await FirebaseFirestore.instance.collection(widget.userID!.email.toString()).add({
-      'history': history,
+      'calc': lastCalc,
       'time': DateTime.now(),
     });
   }
@@ -96,7 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
       prevNum = '';
       newNum = '';
       oper = '';
-      history = '';
+      lastCalc = '';
       num1 = 0.0;
       num2 = 0.0;
       shouldClear = false;
@@ -128,7 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
         prevNum = num1.toString();
         newNum = num2.toString();
         setPrecision();
-        history = '$prevNum $oper $newNum = $ans';
+        lastCalc = '$prevNum $oper $newNum = $ans';
         num1 = 0.0;
         num2 = 0.0;
         oper = '';
@@ -177,7 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
       else if (ans.isEmpty) {
         oper = ope;
       }
-      history = prevNum;
+      lastCalc = prevNum;
     });
   }
 
@@ -222,7 +207,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ans = (temp * temp).toString();
       setPrecision();
       shouldClear == true;
-      history = '$prevNum ^ 2';
+      lastCalc = '$prevNum ^ 2';
     });
   }
 
@@ -233,7 +218,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ans = (temp * temp * temp).toString();
       setPrecision();
       shouldClear == true;
-      history = '$prevNum ^ 3';
+      lastCalc = '$prevNum ^ 3';
     });
   }
 
@@ -268,35 +253,37 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void darkTheme() {
     setState(() {
-      if (!darkEnabled) {
-        darkEnabled = true;
-        backgroundColor = Colors.black;
-        textBoxColor = Colors.white70;
-        appBarColor = Colors.black;
-        themeIcon = Icons.light_mode;
-        style1 = ElevatedButton.styleFrom(
+      if (!globals.darkEnabled) {
+        globals.darkEnabled = true;
+        globals.backgroundColor = Colors.black;
+        globals.textColor = Colors.white;
+        globals.textBoxColor = Colors.white70;
+        globals.appBarColor = Colors.black;
+        globals.themeIcon = Icons.light_mode;
+        globals.style1 = ElevatedButton.styleFrom(
           backgroundColor: Colors.cyan.shade900, foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),);
-        style2 = ElevatedButton.styleFrom(
+        globals.style2 = ElevatedButton.styleFrom(
           backgroundColor: Colors.blueGrey.shade600, foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),);
-        style3 = ElevatedButton.styleFrom(
+        globals.style3 = ElevatedButton.styleFrom(
           backgroundColor: Colors.blueGrey.shade900, foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),);
       }
       else {
-        darkEnabled = false;
-        backgroundColor = Colors.white;
-        textBoxColor = Colors.white;
-        appBarColor = Colors.deepOrange.shade800;
-        themeIcon = Icons.dark_mode;
-        style1 = ElevatedButton.styleFrom(
+        globals.darkEnabled = false;
+        globals.backgroundColor = Colors.white;
+        globals.textColor = Colors.black;
+        globals.textBoxColor = Colors.white;
+        globals.appBarColor = Colors.deepOrange.shade800;
+        globals.themeIcon = Icons.dark_mode;
+        globals.style1 = ElevatedButton.styleFrom(
           backgroundColor: Colors.red.shade500, foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),);
-        style2 = ElevatedButton.styleFrom(
+        globals.style2 = ElevatedButton.styleFrom(
           backgroundColor: Colors.deepOrange.shade500, foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),);
-        style3 = ElevatedButton.styleFrom(
+        globals.style3 = ElevatedButton.styleFrom(
           backgroundColor: Colors.deepOrange.shade300, foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),);
       }
@@ -323,99 +310,98 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        foregroundColor: Colors.white, backgroundColor: appBarColor,
-        title: Text(widget.title), centerTitle: true,
+        foregroundColor: Colors.white, backgroundColor: globals.appBarColor,
+        title: const Text('Calculator'), centerTitle: true,
+        leading: IconButton(icon: Icon(globals.themeIcon),
+          onPressed: () {
+              setState(() {darkTheme();});
+            },),
         actions: <Widget>[
-          IconButton(icon: Icon(themeIcon), onPressed: () {
-              setState(() {
-                darkTheme();
-              });
+            IconButton(icon: const Icon(Icons.history), onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(builder:
+              (context) => HistoryPage()));
             },),
             IconButton(icon: const Icon(Icons.logout), onPressed: () {
               setState(() {
                 signUserOut();
               });
             },),
-            IconButton(icon: const Icon(Icons.history), onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(builder:
-              (context) => HistoryPage()));
-            },),
             ],
       ),
 
       body:
-    Container(color: backgroundColor, child:
+    Container(color: globals.backgroundColor, child:
     Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           SizedBox(width: screenWidth*0.975, height: screenHeight*0.07, child:
             OutlinedButton(style: TextButton.styleFrom(shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                backgroundColor: textBoxColor), onPressed: null, child:
-                  Text(history.split(' = ')[0], style:
+                backgroundColor: globals.textBoxColor), onPressed: null, child:
+                  Text(lastCalc.split(' = ')[0], style:
                     Theme.of(context).textTheme.headlineSmall,),),),
           SizedBox(width: screenWidth*0.975, height: screenHeight*0.07, child:
             OutlinedButton(style: TextButton.styleFrom(shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                backgroundColor: textBoxColor), onPressed: null, child:
+                backgroundColor: globals.textBoxColor), onPressed: null, child:
                   Text(ans, style: Theme.of(context).textTheme.headlineSmall,),),),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  uiButton(0.18, 0.085, style1, clear, 'C'),
-                  uiButton(0.18, 0.085, style2, square, 'x²'),
-                  uiButton(0.18, 0.085, style2, cube, 'x³'),
-                  uiButton(0.18, 0.085, style1, backspace, '⌫'),
+                  uiButton(0.18, 0.085, globals.style1, clear, 'C'),
+                  uiButton(0.18, 0.085, globals.style2, square, 'x²'),
+                  uiButton(0.18, 0.085, globals.style2, cube, 'x³'),
+                  uiButton(0.18, 0.085, globals.style1, backspace, '⌫'),
                 ],
               ),
               SizedBox(height: screenHeight*0.02),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  uiButton(0.18, 0.085, style2, percentage, '%'),
-                  uiButton(0.18, 0.085, style2, (){constants('e');}, 'e'),
-                  uiButton(0.18, 0.085, style2, (){constants('π');}, 'π'),
-                  uiButton(0.18, 0.085, style2, (){operClicked('+');}, '+'),
+                  uiButton(0.18, 0.085, globals.style2, percentage, '%'),
+                  uiButton(0.18, 0.085, globals.style2, (){constants('e');}, 'e'),
+                  uiButton(0.18, 0.085, globals.style2, (){constants('π');}, 'π'),
+                  uiButton(0.18, 0.085, globals.style2, (){operClicked('+');}, '+'),
                 ],
               ),
               SizedBox(height: screenHeight*0.02),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  uiButton(0.18, 0.085, style3, (){numClicked('7');}, '7'),
-                  uiButton(0.18, 0.085, style3, (){numClicked('8');}, '8'),
-                  uiButton(0.18, 0.085, style3, (){numClicked('9');}, '9'),
-                  uiButton(0.18, 0.085, style2, (){operClicked('-');}, '-'),
+                  uiButton(0.18, 0.085, globals.style3, (){numClicked('7');}, '7'),
+                  uiButton(0.18, 0.085, globals.style3, (){numClicked('8');}, '8'),
+                  uiButton(0.18, 0.085, globals.style3, (){numClicked('9');}, '9'),
+                  uiButton(0.18, 0.085, globals.style2, (){operClicked('-');}, '-'),
                 ],
               ),
               SizedBox(height: screenHeight*0.02),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  uiButton(0.18, 0.085, style3, (){numClicked('4');}, '4'),
-                  uiButton(0.18, 0.085, style3, (){numClicked('5');}, '5'),
-                  uiButton(0.18, 0.085, style3, (){numClicked('6');}, '6'),
-                  uiButton(0.18, 0.085, style2, (){operClicked('x');}, 'x'),
+                  uiButton(0.18, 0.085, globals.style3, (){numClicked('4');}, '4'),
+                  uiButton(0.18, 0.085, globals.style3, (){numClicked('5');}, '5'),
+                  uiButton(0.18, 0.085, globals.style3, (){numClicked('6');}, '6'),
+                  uiButton(0.18, 0.085, globals.style2, (){operClicked('x');}, 'x'),
                 ],
               ),
               SizedBox(height: screenHeight*0.02),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  uiButton(0.18, 0.085, style3, (){numClicked('1');}, '1'),
-                  uiButton(0.18, 0.085, style3, (){numClicked('2');}, '2'),
-                  uiButton(0.18, 0.085, style3, (){numClicked('3');}, '3'),
-                  uiButton(0.18, 0.085, style2, (){operClicked('÷');}, '÷'),
+                  uiButton(0.18, 0.085, globals.style3, (){numClicked('1');}, '1'),
+                  uiButton(0.18, 0.085, globals.style3, (){numClicked('2');}, '2'),
+                  uiButton(0.18, 0.085, globals.style3, (){numClicked('3');}, '3'),
+                  uiButton(0.18, 0.085, globals.style2, (){operClicked('÷');}, '÷'),
                 ],
               ),
               SizedBox(height: screenHeight*0.02),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  uiButton(0.18, 0.085, style2, changeSign, '±'),
-                  uiButton(0.18, 0.085, style3, (){numClicked('0');}, '0'),
-                  uiButton(0.18, 0.085, style2, (){numClicked('.');}, '.'),
-                  uiButton(0.18, 0.085, style1, (){
+                  uiButton(0.18, 0.085, globals.style2, changeSign, '±'),
+                  uiButton(0.18, 0.085, globals.style3, (){numClicked('0');}, '0'),
+                  uiButton(0.18, 0.085, globals.style2, (){numClicked('.');}, '.'),
+                  uiButton(0.18, 0.085, globals.style1, (){
                     calculate();
                     if (prevNum.isNotEmpty) {
-                      addUserHistory(history);
+                      save(lastCalc);
                     }
                   }, '='),
                 ],
@@ -438,35 +424,40 @@ class HistoryPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
-        backgroundColor: Colors.deepOrange.shade800,
+        backgroundColor: (!globals.darkEnabled)? Colors.deepOrange.shade800 : Colors.black,
         title: const Text('History'),
         centerTitle: true,
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection(userID!.email.toString()).
-          orderBy('time', descending: true).snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return ListView.builder(
-              itemCount: snapshot.data!.docs.length,
-              itemBuilder: (context, index) {
-                final doc = snapshot.data!.docs[index];
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child:
-                    ListTile(
-                      title: Text(doc['history'], style:
-                        Theme.of(context).textTheme.headlineSmall,),
-                      visualDensity: VisualDensity.standard,
-                      tileColor: Colors.grey[200],
-                    ),
-                );
-              },
-            );
-          } else {
-            return const Center(child: CircularProgressIndicator());
-          }
-        },
+      body: Container(color: globals.backgroundColor,
+        child: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance.collection(userID!.email.toString()).
+            orderBy('time', descending: true).snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ListView.builder(
+                itemCount: snapshot.data!.docs.length,
+                itemBuilder: (context, index) {
+                  final doc = snapshot.data!.docs[index];
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child:
+                      ListTile(
+                        title: Text(doc['calc'], style: const TextStyle(fontSize: 20)),
+                        tileColor: Colors.grey[200], textColor: globals.textColor,
+                      ),
+                  );
+                },
+              );
+            } else {
+                return Center(child: Column(mainAxisAlignment: MainAxisAlignment.center,
+                  children:[
+                      Text('History Is Empty', style: TextStyle(fontSize: 20,
+                      color: globals.textColor),),
+                      const SizedBox(height: 10), const CircularProgressIndicator(),
+                    ],),);
+            }
+          },
+        ),
       ),
     );
   }
