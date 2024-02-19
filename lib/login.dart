@@ -128,14 +128,14 @@ class _LoginPageState extends State<LoginPage> {
       void Function() func, String txt) {
         return SizedBox(width: screenWidth*x, height: screenHeight*y, child:
           ElevatedButton(style: style, onPressed: func, child:
-            Text(txt, style: const TextStyle(fontSize: 28),),),);
+            Text(txt, style: const TextStyle(fontSize: 25),),),);
     }
 
     return Scaffold(
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
         foregroundColor: Colors.white, backgroundColor: globals.appBarColor,
-        title: const Text('Calculator'), centerTitle: true,
+        title: const Text('Sign In'), centerTitle: true,
         leading: IconButton(icon: Icon(globals.themeIcon),
           onPressed: () {
               setState(() {darkTheme();});
@@ -204,9 +204,9 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                 ),
                 SizedBox(height: screenHeight*0.05),
-                uiButton(0.45, 0.06, globals.style1, signUserIn, 'Sign In'),
+                uiButton(0.4, 0.06, globals.style1, signUserIn, 'Sign In'),
                 SizedBox(height: screenHeight*0.02),
-                uiButton(0.45, 0.06, globals.style1, signUserUp, 'Sign Up'),
+                uiButton(0.4, 0.06, globals.style1, signUserUp, 'Sign Up'),
                 SizedBox(height: screenHeight*0.08),
                 ]),
             ),
