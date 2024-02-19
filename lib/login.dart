@@ -128,8 +128,7 @@ class _LoginPageState extends State<LoginPage> {
       void Function() func, String txt) {
         return SizedBox(width: screenWidth*x, height: screenHeight*y, child:
           ElevatedButton(style: style, onPressed: func, child:
-            FittedBox(fit: BoxFit.scaleDown, child: Text(txt,
-              style: const TextStyle(fontSize: 40),),),),);
+            Text(txt, style: const TextStyle(fontSize: 28),),),);
     }
 
     return Scaffold(
@@ -205,9 +204,9 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                 ),
                 SizedBox(height: screenHeight*0.05),
-                uiButton(0.5, 0.05, globals.style1, signUserIn, 'Sign In'),
+                uiButton(0.45, 0.06, globals.style1, signUserIn, 'Sign In'),
                 SizedBox(height: screenHeight*0.02),
-                uiButton(0.5, 0.05, globals.style1, signUserUp, 'Sign Up'),
+                uiButton(0.45, 0.06, globals.style1, signUserUp, 'Sign Up'),
                 SizedBox(height: screenHeight*0.08),
                 ]),
             ),

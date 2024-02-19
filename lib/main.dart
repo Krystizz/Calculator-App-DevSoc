@@ -46,18 +46,14 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  String ans = '';
   String prevNum = '';
   String newNum = '';
   String oper = '';
-  String lastCalc = '';
-
   double num1 = 0.0;
   double num2 = 0.0;
   double temp = 0.0;
   
   bool shouldClear = false;
-  
 
   void save(String lastCalc) async {
     await FirebaseFirestore.instance.collection(widget.userID!).add({
@@ -71,17 +67,17 @@ class _MyHomePageState extends State<MyHomePage> {
       if (shouldClear == true) {
         clear();
       }
-      ans = ans.substring(0, ans.length - 1);
+      globals.ans = globals.ans.substring(0, globals.ans.length - 1);
     });
   }
 
   void clear() {
     setState(() {
-      ans = '';
+      globals.ans = '';
       prevNum = '';
       newNum = '';
       oper = '';
-      lastCalc = '';
+      globals.lastCalc = '';
       num1 = 0.0;
       num2 = 0.0;
       shouldClear = false;
@@ -91,39 +87,39 @@ class _MyHomePageState extends State<MyHomePage> {
   void calculate() {
     setState(() {
       shouldClear = true;
-      if (ans.isNotEmpty) {
-        num2 = double.parse(ans);
+      if (globals.ans.isNotEmpty) {
+        num2 = double.parse(globals.ans);
         if (oper == '+') {
-          ans = (num1 + num2).toString();
+          globals.ans = (num1 + num2).toString();
           prevNum = num1.toString();
           newNum = num2.toString();
           setPrecision();
-          lastCalc = '$prevNum $oper $newNum = $ans';
+          globals.lastCalc = '$prevNum $oper $newNum = ${globals.ans}';
         }
         else if (oper == '-') {
-          ans = (num1 - num2).toString();
+          globals.ans = (num1 - num2).toString();
           prevNum = num1.toString();
           newNum = num2.toString();
           setPrecision();
-          lastCalc = '$prevNum $oper $newNum = $ans';
+          globals.lastCalc = '$prevNum $oper $newNum = ${globals.ans}';
         }
         else if (oper == 'x') {
-          ans = (num1 * num2).toString();
+          globals.ans = (num1 * num2).toString();
           prevNum = num1.toString();
           newNum = num2.toString();
           setPrecision();
-          lastCalc = '$prevNum $oper $newNum = $ans';
+          globals.lastCalc = '$prevNum $oper $newNum = ${globals.ans}';
         }
         else if (oper == '÷') {
           if (num2 == 0) {
             clear();
           }
           else {
-            ans = (num1 / num2).toString();
+            globals.ans = (num1 / num2).toString();
             prevNum = num1.toString();
             newNum = num2.toString();
             setPrecision();
-            lastCalc = '$prevNum $oper $newNum = $ans';
+            globals.lastCalc = '$prevNum $oper $newNum = ${globals.ans}';
           }
         }
         num1 = 0.0;
@@ -142,12 +138,12 @@ class _MyHomePageState extends State<MyHomePage> {
         clear();
       }
       if (numC=='.'){
-        if (!ans.contains('.')){
-          ans = ans + numC;
+        if (!globals.ans.contains('.')){
+          globals.ans = globals.ans + numC;
         }
       }
       else {
-        ans = ans + numC;
+        globals.ans = globals.ans + numC;
       }
     });
   }
@@ -155,33 +151,33 @@ class _MyHomePageState extends State<MyHomePage> {
   void operClicked(String ope){
     setState(() {
       shouldClear = false;
-      if (ans.isNotEmpty) {
-        prevNum = ans;
+      if (globals.ans.isNotEmpty) {
+        prevNum = globals.ans;
         if (oper != '') {
           calculate();
           shouldClear = false;
-          prevNum = ans;
-          num1 = double.parse(ans);
-          ans = '';
+          prevNum = globals.ans;
+          num1 = double.parse(globals.ans);
+          globals.ans = '';
           oper = ope;
         }
         else{
-          num1 = double.parse(ans);
-          ans = '';
+          num1 = double.parse(globals.ans);
+          globals.ans = '';
           oper = ope;
         }
       }
-      else if (ans.isEmpty) {
+      else if (globals.ans.isEmpty) {
         oper = ope;
       }
-      lastCalc = prevNum;
+      globals.lastCalc = prevNum;
     });
   }
 
   void changeSign(){
     setState(() {
-      temp = double.parse(ans) * (-1.0);
-      ans = temp.toString();
+      temp = double.parse(globals.ans) * (-1.0);
+      globals.ans = temp.toString();
       setPrecision();
       shouldClear == false;
     });
@@ -189,12 +185,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void percentage(){
     setState(() {
-      temp = double.parse(ans) / 100.0;
-      prevNum = ans;
-      ans = temp.toString();
+      temp = double.parse(globals.ans) / 100.0;
+      prevNum = globals.ans;
+      globals.ans = temp.toString();
       setPrecision();
       shouldClear == true;
-      lastCalc = '$prevNum% = $ans';
+      globals.lastCalc = '$prevNum% = ${globals.ans}';
     });
   }
 
@@ -204,11 +200,11 @@ class _MyHomePageState extends State<MyHomePage> {
         clear();
       }
       if (k == 'π') {
-        ans = '3.14159';
+        globals.ans = '3.14159';
         shouldClear == false;
       }
       else if (k == 'e') {
-        ans = '2.71828';
+        globals.ans = '2.71828';
         shouldClear == false;
       }
     });
@@ -216,33 +212,33 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void square() {
     setState(() {
-      temp = double.parse(ans);
-      prevNum = ans;
-      ans = (temp * temp).toString();
+      temp = double.parse(globals.ans);
+      prevNum = globals.ans;
+      globals.ans = (temp * temp).toString();
       setPrecision();
       shouldClear == true;
-      lastCalc = '$prevNum ^ 2 = $ans';
+      globals.lastCalc = '$prevNum ^ 2 = ${globals.ans}';
     });
   }
 
   void cube() {
     setState(() {
-      temp = double.parse(ans);
-      prevNum = ans;
-      ans = (temp * temp * temp).toString();
+      temp = double.parse(globals.ans);
+      prevNum = globals.ans;
+      globals.ans = (temp * temp * temp).toString();
       setPrecision();
       shouldClear == true;
-      lastCalc = '$prevNum ^ 3 = $ans';
+      globals.lastCalc = '$prevNum ^ 3 = ${globals.ans}';
     });
   }
 
   void setPrecision(){
     setState(() {
-      if (ans.isNotEmpty)
+      if (globals.ans.isNotEmpty)
       {
-        temp = double.parse(ans);
+        temp = double.parse(globals.ans);
         if ((temp - (temp.round()).toDouble()).abs() < 1e-12) {
-          ans = (temp.round()).toString();
+          globals.ans = (temp.round()).toString();
         }
       }
       if (prevNum.isNotEmpty)
@@ -259,7 +255,7 @@ class _MyHomePageState extends State<MyHomePage> {
             newNum = ((double.parse(newNum)).round()).toString();
         }
       }
-      ans = ans.toString();
+      globals.ans = globals.ans.toString();
       prevNum = prevNum.toString();
       newNum = newNum.toString();
     });
@@ -333,8 +329,8 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: <Widget>[
             IconButton(icon: const Icon(Icons.history), onPressed: () {
               Navigator.of(context).push(MaterialPageRoute(builder:
-              (context) => HistoryPage()));
-            },),
+              (context) => HistoryPage())).then((value) {setState(() {});});
+              }),
             IconButton(icon: const Icon(Icons.logout), onPressed: () {
               setState(() {
                 signUserOut();
@@ -352,13 +348,13 @@ class _MyHomePageState extends State<MyHomePage> {
             OutlinedButton(style: TextButton.styleFrom(shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                 backgroundColor: globals.textBoxColor), onPressed: null, child:
-                  Text(lastCalc.split(' = ')[0], style:
+                  Text(globals.lastCalc.split(' = ')[0], style:
                     TextStyle(fontSize: 25, color: globals.textColor)),),),
           SizedBox(width: screenWidth*0.92, height: screenHeight*0.07, child:
             OutlinedButton(style: TextButton.styleFrom(shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                 backgroundColor: globals.textBoxColor), onPressed: null, child:
-                  Text(ans, style: TextStyle(fontSize: 25, color: globals.textColor)),),),
+                  Text(globals.ans, style: TextStyle(fontSize: 25, color: globals.textColor)),),),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -415,7 +411,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   uiButton(0.18, 0.085, globals.style1, (){
                     calculate();
                     if (prevNum.isNotEmpty) {
-                      save(lastCalc);
+                      save(globals.lastCalc);
                     }
                   }, '='),
                 ],
@@ -441,6 +437,9 @@ class HistoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
@@ -462,22 +461,25 @@ class HistoryPage extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final doc = snapshot.data!.docs[index];
                   return Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(screenWidth*0.04),
                     child:
-                      ListTile(
-                        title: Text(doc['calc'], style: const TextStyle(fontSize: 20)),
-                        tileColor: Colors.grey[200], textColor: globals.textColor,
+                      GestureDetector(
+                        onTap: () {
+                          globals.lastCalc = doc['calc'];
+                          globals.ans = doc['calc'].split(' = ')[1];
+                          Navigator.of(context).pop();
+                        },
+                        child: ListTile(
+                          title: Text(doc['calc'], style: const TextStyle(fontSize: 20)),
+                          textColor: globals.textColor,
+                        ),
                       ),
                   );
                 },
               );
-            } else {
-                return Center(child: Column(mainAxisAlignment: MainAxisAlignment.center,
-                  children:[
-                      Text('History Is Empty', style: TextStyle(fontSize: 20,
-                      color: globals.textColor),),
-                      const SizedBox(height: 10), const CircularProgressIndicator(),
-                    ],),);
+            }
+            else {
+                return const Center(child: CircularProgressIndicator());
             }
           },
         ),

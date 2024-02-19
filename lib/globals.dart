@@ -8,6 +8,9 @@ Color backgroundColor = Colors.white;
 Color appBarColor = Colors.deepOrange.shade800;
 IconData themeIcon = Icons.dark_mode;
 
+String ans = '';
+String lastCalc = '';
+
 ButtonStyle style1 = ElevatedButton.styleFrom(backgroundColor: Colors.red.shade500,
     foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius:
     BorderRadius.circular(20)),);
