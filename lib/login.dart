@@ -1,4 +1,4 @@
-import 'main.dart';
+import 'homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'globals.dart' as globals;
