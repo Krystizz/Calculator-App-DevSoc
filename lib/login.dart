@@ -46,6 +46,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void signUserIn() async {
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      showErrorMessage('Please fill in your authentication details!');
+      return;
+    }
     showDialog(context: context, builder: (context) {
       return const Center(child: CircularProgressIndicator());
     });
@@ -58,11 +62,15 @@ class _LoginPageState extends State<LoginPage> {
     }
     on FirebaseAuthException catch (e) {
       if (mounted) Navigator.pop(context);
-      showErrorMessage(e.code);
+      showErrorMessage('Authentication Error (${e.code}: ${e.message})');
     }
   }
 
   void signUserUp() async {
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      showErrorMessage('Please fill in your authentication details!');
+      return;
+    }
     showDialog(context: context, builder: (context) {
       return const Center(child: CircularProgressIndicator());
     });
@@ -75,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
     }
     on FirebaseAuthException catch (e) {
       if (mounted) Navigator.pop(context);
-      showErrorMessage(e.code);
+      showErrorMessage('Authentication Error (${e.code}: ${e.message})');
     }
   }
 

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:decimal/decimal.dart';
 import 'history.dart';
 import 'currency.dart';
 import 'globals.dart' as globals;
+import 'dart:math' as math;
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({super.key});
@@ -19,9 +21,9 @@ class _MyHomePageState extends State<MyHomePage> {
   String prevNum = '';
   String newNum = '';
   String oper = '';
-  double num1 = 0.0;
-  double num2 = 0.0;
-  double temp = 0.0;
+  Decimal num1 = Decimal.parse('0.0');
+  Decimal num2 = Decimal.parse('0.0');
+  Decimal temp = Decimal.parse('0.0');
   
   bool shouldClear = false;
 
@@ -46,7 +48,9 @@ class _MyHomePageState extends State<MyHomePage> {
       if (shouldClear == true) {
         clear();
       }
-      globals.ans = globals.ans.substring(0, globals.ans.length - 1);
+      if (globals.ans.isNotEmpty) {
+        globals.ans = globals.ans.substring(0, globals.ans.length - 1);
+      }
     });
   }
 
@@ -57,8 +61,8 @@ class _MyHomePageState extends State<MyHomePage> {
       newNum = '';
       oper = '';
       globals.lastCalc = '';
-      num1 = 0.0;
-      num2 = 0.0;
+      num1 = Decimal.parse('0.0');
+      num2 = Decimal.parse('0.0');
       shouldClear = false;
     });
   }
@@ -67,43 +71,63 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       shouldClear = true;
       if (globals.ans.isNotEmpty) {
-        num2 = double.parse(globals.ans);
+        num2 = Decimal.parse(globals.ans);
         if (oper == '+') {
           globals.ans = (num1 + num2).toString();
           prevNum = num1.toString();
           newNum = num2.toString();
-          setPrecision();
-          globals.lastCalc = '$prevNum $oper $newNum = ${globals.ans}';
         }
         else if (oper == '-') {
           globals.ans = (num1 - num2).toString();
           prevNum = num1.toString();
           newNum = num2.toString();
-          setPrecision();
-          globals.lastCalc = '$prevNum $oper $newNum = ${globals.ans}';
         }
         else if (oper == 'x') {
           globals.ans = (num1 * num2).toString();
           prevNum = num1.toString();
           newNum = num2.toString();
-          setPrecision();
-          globals.lastCalc = '$prevNum $oper $newNum = ${globals.ans}';
         }
-        else if (oper == '÷') {
-          if (num2 == 0) {
-            clear();
-            showErrorMessage('Cannot divide by zero');
-          }
-          else {
-            globals.ans = (num1 / num2).toString();
+        else if (oper == '^') {
+          try {
+            temp = Decimal.parse((math.pow(num1.toDouble(), num2.toDouble())).toString());
+            globals.ans = temp.toString();
             prevNum = num1.toString();
             newNum = num2.toString();
-            setPrecision();
-            globals.lastCalc = '$prevNum $oper $newNum = ${globals.ans}';
+          }
+          catch (e) {
+            showErrorMessage('Math Error (Invalid Input)');
+            clear();
+            return;
           }
         }
-        num1 = 0.0;
-        num2 = 0.0;
+        else if (oper == '÷') {
+          if (num2 == Decimal.parse('0.0')) {
+            showErrorMessage('Math Error (Cannot divide by zero)');
+            clear();
+            return;
+          }
+          else {
+            globals.ans = (num1 / num2).toDouble().toString();
+            prevNum = num1.toString();
+            newNum = num2.toString();
+          }
+        }
+        if (globals.ans.contains('.') && Decimal.parse(globals.ans) > Decimal.parse('1') &&
+          globals.ans.substring(globals.ans.indexOf('.'), globals.ans.length).length > 4)
+        {
+          globals.ans = globals.ans.substring(0, globals.ans.indexOf('.') + 4);
+        }
+        if (Decimal.parse(globals.ans) > Decimal.parse('1e10'))
+        {
+          globals.ans = Decimal.parse(globals.ans).toStringAsExponential(3);
+        }
+        if (Decimal.parse(prevNum) > Decimal.parse('1e10'))
+        {
+          prevNum = Decimal.parse(prevNum).toStringAsExponential(3);
+        }
+        globals.lastCalc = '$prevNum $oper $newNum = ${globals.ans}';
+        num1 = Decimal.parse('0.0');
+        num2 = Decimal.parse('0.0');
         oper = '';
       }
       else {
@@ -114,7 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void numClicked(numC){
     setState(() {
-      if (shouldClear == true) {
+      if (shouldClear) {
         clear();
       }
       if (numC=='.'){
@@ -137,12 +161,12 @@ class _MyHomePageState extends State<MyHomePage> {
           calculate();
           shouldClear = false;
           prevNum = globals.ans;
-          num1 = double.parse(globals.ans);
+          num1 = Decimal.parse(globals.ans);
           globals.ans = '';
           oper = ope;
         }
         else{
-          num1 = double.parse(globals.ans);
+          num1 = Decimal.parse(globals.ans);
           globals.ans = '';
           oper = ope;
         }
@@ -156,88 +180,83 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void changeSign(){
     setState(() {
-      temp = double.parse(globals.ans) * (-1.0);
+      if (globals.ans.isEmpty) {
+        return;
+      }
+      temp = Decimal.parse(globals.ans) * Decimal.parse('-1.0');
       globals.ans = temp.toString();
-      setPrecision();
-      shouldClear == false;
-    });
-  }
-
-  void percentage(){
-    setState(() {
-      temp = double.parse(globals.ans) / 100.0;
-      prevNum = globals.ans;
-      globals.ans = temp.toString();
-      setPrecision();
-      shouldClear == true;
-      globals.lastCalc = '$prevNum% = ${globals.ans}';
+      shouldClear = false;
     });
   }
 
   void constants(k){
     setState(() {
-      if (shouldClear == true) {
+      if (shouldClear) {
         clear();
       }
       if (k == 'π') {
         globals.ans = '3.14159';
-        shouldClear == false;
+        shouldClear = false;
       }
       else if (k == 'e') {
         globals.ans = '2.71828';
-        shouldClear == false;
+        shouldClear = false;
       }
     });
   }
 
-  void square() {
+  void scientific(String s) {
     setState(() {
-      temp = double.parse(globals.ans);
-      prevNum = globals.ans;
-      globals.ans = (temp * temp).toString();
-      setPrecision();
-      shouldClear == true;
-      globals.lastCalc = '$prevNum ^ 2 = ${globals.ans}';
-    });
-  }
-
-  void cube() {
-    setState(() {
-      temp = double.parse(globals.ans);
-      prevNum = globals.ans;
-      globals.ans = (temp * temp * temp).toString();
-      setPrecision();
-      shouldClear == true;
-      globals.lastCalc = '$prevNum ^ 3 = ${globals.ans}';
-    });
-  }
-
-  void setPrecision(){
-    setState(() {
-      if (globals.ans.isNotEmpty)
-      {
-        temp = double.parse(globals.ans);
-        if ((temp - (temp.round()).toDouble()).abs() < 1e-12) {
-          globals.ans = (temp.round()).toString();
-        }
+      if (globals.ans.isEmpty) {
+        return;
       }
-      if (prevNum.isNotEmpty)
-      {
-        temp = double.parse(prevNum);
-        if (prevNum.isNotEmpty && (temp - (temp.round()).toDouble()).abs() < 1e-12) {
-            prevNum = ((double.parse(prevNum)).round()).toString();
+      try {
+        if (s == 'sin') {
+          temp = Decimal.parse((math.sin(double.parse(globals.ans))).toString());
         }
-      }
-      if (newNum.isNotEmpty)
-      {
-        temp = double.parse(newNum);
-        if (newNum.isNotEmpty && (temp - (temp.round()).toDouble()).abs() < 1e-12) {
-            newNum = ((double.parse(newNum)).round()).toString();
+        else if (s == 'cos') {
+          temp = Decimal.parse((math.cos(double.parse(globals.ans))).toString());
         }
+        else if (s == 'tan') {
+          temp = Decimal.parse((math.tan(double.parse(globals.ans))).toString());
+        }
+        else if (s == 'arcsin') {
+          temp = Decimal.parse((math.asin(double.parse(globals.ans))).toString());
+        }
+        else if (s == 'arccos') {
+          temp = Decimal.parse((math.acos(double.parse(globals.ans))).toString());
+        }
+        else if (s == 'arctan') {
+          temp = Decimal.parse((math.atan(double.parse(globals.ans))).toString());
+        }
+        else if (s == 'ln') {
+          temp = Decimal.parse((math.log(double.parse(globals.ans))).toString());
+        }
+        else if (s == 'sqrt') {
+          temp = Decimal.parse((math.pow(double.parse(globals.ans), 0.5)).toString());
+        }
+        prevNum = globals.ans;
+        globals.ans = temp.toStringAsFixed(5);
+        if (globals.ans.contains('.') && Decimal.parse(globals.ans) > Decimal.parse('1') &&
+          globals.ans.substring(globals.ans.indexOf('.'), globals.ans.length).length > 4)
+        {
+          globals.ans = globals.ans.substring(0, globals.ans.indexOf('.') + 4);
+        }
+        if (Decimal.parse(globals.ans) > Decimal.parse('1e10'))
+        {
+          globals.ans = Decimal.parse(globals.ans).toStringAsExponential(3);
+        }
+        if (Decimal.parse(prevNum) > Decimal.parse('1e10'))
+        {
+          prevNum = Decimal.parse(prevNum).toStringAsExponential(3);
+        }
+        globals.lastCalc = '$s($prevNum) = ${globals.ans}';
+        save(globals.lastCalc);
       }
-      globals.ans = globals.ans.toString();
-      prevNum = prevNum.toString();
-      newNum = newNum.toString();
+      catch (e) {
+        showErrorMessage('Math Error (Invalid Input)');
+      }
+      shouldClear = true;
     });
   }
 
@@ -385,55 +404,61 @@ class _MyHomePageState extends State<MyHomePage> {
             children: <Widget>[
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  uiButton(0.18, 0.085, globals.style1, clear, 'C'),
-                  uiButton(0.18, 0.085, globals.style2, square, 'x²'),
-                  uiButton(0.18, 0.085, globals.style2, cube, 'x³'),
-                  uiButton(0.18, 0.085, globals.style1, backspace, '⌫'),
+                  uiButton(0.17, 0.08, globals.style1, clear, 'C'),
+                  uiButton(0.17, 0.08, globals.style2, (){scientific('sin');}, 'sin'),
+                  uiButton(0.17, 0.08, globals.style2, (){scientific('cos');}, 'cos'),
+                  uiButton(0.17, 0.08, globals.style2, (){scientific('tan');}, 'tan'),
+                  uiButton(0.17, 0.08, globals.style1, backspace, '⌫'),
                 ],
               ),
               SizedBox(height: screenHeight*0.02),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  uiButton(0.18, 0.085, globals.style2, percentage, '%'),
-                  uiButton(0.18, 0.085, globals.style2, (){constants('e');}, 'e'),
-                  uiButton(0.18, 0.085, globals.style2, (){constants('π');}, 'π'),
-                  uiButton(0.18, 0.085, globals.style2, (){operClicked('+');}, '+'),
+                  uiButton(0.17, 0.08, globals.style2, (){operClicked('^');}, '^'),
+                  uiButton(0.17, 0.08, globals.style2, (){scientific('arcsin');}, 'sin\ninv'),
+                  uiButton(0.17, 0.08, globals.style2, (){scientific('arccos');}, 'cos\ninv'),
+                  uiButton(0.17, 0.08, globals.style2, (){scientific('arctan');}, 'tan\ninv'),
+                  uiButton(0.17, 0.08, globals.style2, (){operClicked('+');}, '+'),
                 ],
               ),
               SizedBox(height: screenHeight*0.02),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  uiButton(0.18, 0.085, globals.style3, (){numClicked('7');}, '7'),
-                  uiButton(0.18, 0.085, globals.style3, (){numClicked('8');}, '8'),
-                  uiButton(0.18, 0.085, globals.style3, (){numClicked('9');}, '9'),
-                  uiButton(0.18, 0.085, globals.style2, (){operClicked('-');}, '-'),
+                  uiButton(0.17, 0.08, globals.style2, (){scientific('sqrt');}, '√'),
+                  uiButton(0.17, 0.08, globals.style3, (){numClicked('7');}, '7'),
+                  uiButton(0.17, 0.08, globals.style3, (){numClicked('8');}, '8'),
+                  uiButton(0.17, 0.08, globals.style3, (){numClicked('9');}, '9'),
+                  uiButton(0.17, 0.08, globals.style2, (){operClicked('-');}, '-'),
                 ],
               ),
               SizedBox(height: screenHeight*0.02),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  uiButton(0.18, 0.085, globals.style3, (){numClicked('4');}, '4'),
-                  uiButton(0.18, 0.085, globals.style3, (){numClicked('5');}, '5'),
-                  uiButton(0.18, 0.085, globals.style3, (){numClicked('6');}, '6'),
-                  uiButton(0.18, 0.085, globals.style2, (){operClicked('x');}, 'x'),
+                  uiButton(0.17, 0.08, globals.style2, (){scientific('ln');}, 'ln'),
+                  uiButton(0.17, 0.08, globals.style3, (){numClicked('4');}, '4'),
+                  uiButton(0.17, 0.08, globals.style3, (){numClicked('5');}, '5'),
+                  uiButton(0.17, 0.08, globals.style3, (){numClicked('6');}, '6'),
+                  uiButton(0.17, 0.08, globals.style2, (){operClicked('x');}, 'x'),
                 ],
               ),
               SizedBox(height: screenHeight*0.02),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  uiButton(0.18, 0.085, globals.style3, (){numClicked('1');}, '1'),
-                  uiButton(0.18, 0.085, globals.style3, (){numClicked('2');}, '2'),
-                  uiButton(0.18, 0.085, globals.style3, (){numClicked('3');}, '3'),
-                  uiButton(0.18, 0.085, globals.style2, (){operClicked('÷');}, '÷'),
+                  uiButton(0.17, 0.08, globals.style2, (){constants('e');}, 'e'),
+                  uiButton(0.17, 0.08, globals.style3, (){numClicked('1');}, '1'),
+                  uiButton(0.17, 0.08, globals.style3, (){numClicked('2');}, '2'),
+                  uiButton(0.17, 0.08, globals.style3, (){numClicked('3');}, '3'),
+                  uiButton(0.17, 0.08, globals.style2, (){operClicked('÷');}, '÷'),
                 ],
               ),
               SizedBox(height: screenHeight*0.02),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  uiButton(0.18, 0.085, globals.style2, changeSign, '±'),
-                  uiButton(0.18, 0.085, globals.style3, (){numClicked('0');}, '0'),
-                  uiButton(0.18, 0.085, globals.style2, (){numClicked('.');}, '.'),
-                  uiButton(0.18, 0.085, globals.style1, (){
+                  uiButton(0.17, 0.08, globals.style2, (){constants('π');}, 'π'),
+                  uiButton(0.17, 0.08, globals.style2, changeSign, '±'),
+                  uiButton(0.17, 0.08, globals.style3, (){numClicked('0');}, '0'),
+                  uiButton(0.17, 0.08, globals.style2, (){numClicked('.');}, '.'),
+                  uiButton(0.17, 0.08, globals.style1, (){
                     calculate();
                     if (prevNum.isNotEmpty) {
                       save(globals.lastCalc);

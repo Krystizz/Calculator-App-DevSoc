@@ -1,3 +1,4 @@
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'globals.dart' as globals;
@@ -17,7 +18,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
   String givenAmount = '';
   String fromCurr = '';
   String toCurr = '';
-  double conversionRate = 1;
+  Decimal conversionRate = Decimal.parse('1');
   List<String> currencies = ['AED', 'AFN', 'ALL', 'AMD', 'ANG', 'AOA', 'ARS', 'AUD',
     'AWG', 'AZN', 'BAM', 'BBD', 'BDT', 'BGN', 'BHD', 'BIF', 'BMD', 'BND', 'BOB', 'BOV',
     'BRL', 'BSD', 'BTN', 'BWP', 'BYN', 'BZD', 'CAD', 'CDF', 'CHE', 'CHF', 'CHW', 'CLF',
@@ -46,7 +47,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
   }
 
   void getData() async {
-    conversionRate = 1;
+    conversionRate = Decimal.parse('1');
     convertedAmount = '';
     if (fromCurr.isEmpty || toCurr.isEmpty || fromCurr == toCurr) {
       return;
@@ -63,10 +64,10 @@ class _CurrencyPageState extends State<CurrencyPage> {
       );
 	    if (response.statusCode == 200) {
 		    final body = jsonDecode(response.body);
-        conversionRate = body['conversion_rate'];
+        conversionRate = Decimal.parse(body['conversion_rate'].toString());
 	    }
       else {
-        showErrorMessage(response.statusCode.toString());
+        showErrorMessage('Failed to retrieve data (${response.statusCode})');
       }
     }
     catch (err) {
@@ -80,20 +81,20 @@ class _CurrencyPageState extends State<CurrencyPage> {
   void convertCurrency() {
     setState(() {
       shouldClear = true;
-      if (givenAmount.isNotEmpty) {
-        double num = double.parse(givenAmount);
-        convertedAmount = (num * conversionRate).toString();
-        num = double.parse(convertedAmount);
-        if ((num - num.round().toDouble()).abs() < 1e-12) {
-            convertedAmount = num.round().toString();
-        }
-        if (convertedAmount == givenAmount) {
-          convertedAmount = '';
-          showErrorMessage('Select different currencies');
-        }
+      if (givenAmount.isEmpty) {
+        showErrorMessage('Please enter an amount!');
+      }
+      else if (fromCurr.isEmpty || toCurr.isEmpty) {
+        showErrorMessage('Please select currencies!');
       }
       else {
-        shouldClear = false;
+        Decimal num = Decimal.parse(givenAmount);
+        convertedAmount = (num * conversionRate).toString();
+        num = Decimal.parse(convertedAmount);
+        if (convertedAmount == givenAmount) {
+          convertedAmount = '';
+          showErrorMessage('Same currencies selected!');
+        }
       }
     });
   }
