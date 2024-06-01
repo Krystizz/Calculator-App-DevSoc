@@ -1,6 +1,7 @@
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:auto_size_text/auto_size_text.dart';
 import 'globals.dart' as globals;
 import 'apikey.dart' as apikey;
 import 'dart:convert';
@@ -44,6 +45,27 @@ class _CurrencyPageState extends State<CurrencyPage> {
         title: Center(child: Text(msg, style: TextStyle(color: globals.textColor))),
       );
     });
+  }
+
+  String formatNumber(String num) {
+    if (Decimal.parse(num) > Decimal.parse('1e10'))
+    {
+      num = Decimal.parse(num).toStringAsExponential(3);
+    }
+    else if (Decimal.parse(num) < Decimal.parse('1e-5'))
+    {
+      num = Decimal.parse(num).toStringAsExponential(3);
+    }
+    else if (num.contains('.') && Decimal.parse(num) > Decimal.parse('1') &&
+      num.substring(num.indexOf('.'), num.length).length > 4)
+    {
+      num = num.substring(0, num.indexOf('.') + 4);
+    }
+    else if (num.contains('.') && num.substring(num.indexOf('.'), num.length).length > 6)
+    {
+      num = Decimal.parse(num).toStringAsFixed(5);
+    }
+    return num;
   }
 
   void getData() async {
@@ -94,6 +116,10 @@ class _CurrencyPageState extends State<CurrencyPage> {
         if (convertedAmount == givenAmount) {
           convertedAmount = '';
           showErrorMessage('Same currencies selected!');
+        }
+        else {
+          convertedAmount = formatNumber(convertedAmount);
+          givenAmount = formatNumber(givenAmount);
         }
       }
     });
@@ -164,12 +190,16 @@ class _CurrencyPageState extends State<CurrencyPage> {
             OutlinedButton(style: TextButton.styleFrom(shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                 backgroundColor: globals.textBoxColor), onPressed: null, child:
-                  Text(givenAmount, style: TextStyle(fontSize: 25, color: globals.textColor)),),),
+                  AutoSizeText(givenAmount,
+                    minFontSize: 20, maxFontSize: 25, maxLines: 1,
+                    overflow: TextOverflow.ellipsis,style: TextStyle(color: globals.textColor)))),
           SizedBox(width: screenWidth*0.92, height: screenHeight*0.07, child:
             OutlinedButton(style: TextButton.styleFrom(shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                 backgroundColor: globals.textBoxColor), onPressed: null, child:
-                  Text(convertedAmount, style: TextStyle(fontSize: 25, color: globals.textColor)),),),
+                  AutoSizeText(convertedAmount,
+                    minFontSize: 20, maxFontSize: 25, maxLines: 1,
+                    overflow: TextOverflow.ellipsis,style: TextStyle(color: globals.textColor)))),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[

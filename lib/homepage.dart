@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:decimal/decimal.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'history.dart';
 import 'currency.dart';
 import 'globals.dart' as globals;
@@ -24,7 +25,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Decimal num1 = Decimal.parse('0.0');
   Decimal num2 = Decimal.parse('0.0');
   Decimal temp = Decimal.parse('0.0');
-  
   bool shouldClear = false;
 
   void save(String lastCalc) async {
@@ -65,6 +65,27 @@ class _MyHomePageState extends State<MyHomePage> {
       num2 = Decimal.parse('0.0');
       shouldClear = false;
     });
+  }
+
+  String formatNumber(String num) {
+    if (Decimal.parse(num) > Decimal.parse('1e10'))
+    {
+      num = Decimal.parse(num).toStringAsExponential(3);
+    }
+    else if (Decimal.parse(num) < Decimal.parse('1e-5'))
+    {
+      num = Decimal.parse(num).toStringAsExponential(3);
+    }
+    else if (num.contains('.') && Decimal.parse(num) > Decimal.parse('1') &&
+      num.substring(num.indexOf('.'), num.length).length > 4)
+    {
+      num = num.substring(0, num.indexOf('.') + 4);
+    }
+    else if (num.contains('.') && num.substring(num.indexOf('.'), num.length).length > 6)
+    {
+      num = Decimal.parse(num).toStringAsFixed(5);
+    }
+    return num;
   }
 
   void calculate() {
@@ -112,19 +133,9 @@ class _MyHomePageState extends State<MyHomePage> {
             newNum = num2.toString();
           }
         }
-        if (globals.ans.contains('.') && Decimal.parse(globals.ans) > Decimal.parse('1') &&
-          globals.ans.substring(globals.ans.indexOf('.'), globals.ans.length).length > 4)
-        {
-          globals.ans = globals.ans.substring(0, globals.ans.indexOf('.') + 4);
-        }
-        if (Decimal.parse(globals.ans) > Decimal.parse('1e10'))
-        {
-          globals.ans = Decimal.parse(globals.ans).toStringAsExponential(3);
-        }
-        if (Decimal.parse(prevNum) > Decimal.parse('1e10'))
-        {
-          prevNum = Decimal.parse(prevNum).toStringAsExponential(3);
-        }
+        globals.ans = formatNumber(globals.ans);
+        prevNum = formatNumber(prevNum);
+        newNum = formatNumber(newNum);
         globals.lastCalc = '$prevNum $oper $newNum = ${globals.ans}';
         num1 = Decimal.parse('0.0');
         num2 = Decimal.parse('0.0');
@@ -156,7 +167,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       shouldClear = false;
       if (globals.ans.isNotEmpty) {
-        prevNum = globals.ans;
+        prevNum = formatNumber(globals.ans);
         if (oper != '') {
           calculate();
           shouldClear = false;
@@ -237,19 +248,8 @@ class _MyHomePageState extends State<MyHomePage> {
         }
         prevNum = globals.ans;
         globals.ans = temp.toStringAsFixed(5);
-        if (globals.ans.contains('.') && Decimal.parse(globals.ans) > Decimal.parse('1') &&
-          globals.ans.substring(globals.ans.indexOf('.'), globals.ans.length).length > 4)
-        {
-          globals.ans = globals.ans.substring(0, globals.ans.indexOf('.') + 4);
-        }
-        if (Decimal.parse(globals.ans) > Decimal.parse('1e10'))
-        {
-          globals.ans = Decimal.parse(globals.ans).toStringAsExponential(3);
-        }
-        if (Decimal.parse(prevNum) > Decimal.parse('1e10'))
-        {
-          prevNum = Decimal.parse(prevNum).toStringAsExponential(3);
-        }
+        globals.ans = formatNumber(globals.ans);
+        prevNum = formatNumber(prevNum);
         globals.lastCalc = '$s($prevNum) = ${globals.ans}';
         save(globals.lastCalc);
       }
@@ -314,7 +314,14 @@ class _MyHomePageState extends State<MyHomePage> {
         return SizedBox(width: screenWidth*x, height: screenHeight*y, child:
           ElevatedButton(style: style, onPressed: func, child:
             FittedBox(fit: BoxFit.scaleDown, child: Text(txt,
-              style: const TextStyle(fontSize: 40),),),),);
+              style: const TextStyle(fontSize: 40)))));
+    }
+
+    SizedBox trigButton(double x, double y, ButtonStyle style,
+      void Function() func, String txt, int n) {
+        return SizedBox(width: screenWidth*x, height: screenHeight*y, child:
+          ElevatedButton(style: style, onPressed: func, child:
+            AutoSizeText(txt, minFontSize: 10, maxLines: n)));
     }
 
     return Scaffold(
@@ -392,22 +399,25 @@ class _MyHomePageState extends State<MyHomePage> {
             OutlinedButton(style: TextButton.styleFrom(shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                 backgroundColor: globals.textBoxColor), onPressed: null, child:
-                  Text(globals.lastCalc.split(' = ')[0], style:
-                    TextStyle(fontSize: 25, color: globals.textColor)),),),
+                  AutoSizeText(globals.lastCalc.split(' = ')[0],
+                    minFontSize: 20, maxFontSize: 25, maxLines: 1,
+                    overflow: TextOverflow.ellipsis,style: TextStyle(color: globals.textColor)))),
           SizedBox(width: screenWidth*0.92, height: screenHeight*0.07, child:
             OutlinedButton(style: TextButton.styleFrom(shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                 backgroundColor: globals.textBoxColor), onPressed: null, child:
-                  Text(globals.ans, style: TextStyle(fontSize: 25, color: globals.textColor)),),),
+                  AutoSizeText(globals.ans,
+                    minFontSize: 20, maxFontSize: 25, maxLines: 1,
+                    overflow: TextOverflow.ellipsis,style: TextStyle(color: globals.textColor)))),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   uiButton(0.17, 0.08, globals.style1, clear, 'C'),
-                  uiButton(0.17, 0.08, globals.style2, (){scientific('sin');}, 'sin'),
-                  uiButton(0.17, 0.08, globals.style2, (){scientific('cos');}, 'cos'),
-                  uiButton(0.17, 0.08, globals.style2, (){scientific('tan');}, 'tan'),
+                  trigButton(0.18, 0.08, globals.style2, (){scientific('sin');}, 'sin', 1),
+                  trigButton(0.18, 0.08, globals.style2, (){scientific('cos');}, 'cos', 1),
+                  trigButton(0.18, 0.08, globals.style2, (){scientific('tan');}, 'tan', 1),
                   uiButton(0.17, 0.08, globals.style1, backspace, '⌫'),
                 ],
               ),
@@ -415,9 +425,9 @@ class _MyHomePageState extends State<MyHomePage> {
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   uiButton(0.17, 0.08, globals.style2, (){operClicked('^');}, '^'),
-                  uiButton(0.17, 0.08, globals.style2, (){scientific('arcsin');}, 'sin\ninv'),
-                  uiButton(0.17, 0.08, globals.style2, (){scientific('arccos');}, 'cos\ninv'),
-                  uiButton(0.17, 0.08, globals.style2, (){scientific('arctan');}, 'tan\ninv'),
+                  trigButton(0.18, 0.08, globals.style2, (){scientific('arcsin');}, 'arc\nsin', 2),
+                  trigButton(0.18, 0.08, globals.style2, (){scientific('arccos');}, 'arc\ncos', 2),
+                  trigButton(0.18, 0.08, globals.style2, (){scientific('arctan');}, 'arc\ntan', 2),
                   uiButton(0.17, 0.08, globals.style2, (){operClicked('+');}, '+'),
                 ],
               ),
@@ -425,9 +435,9 @@ class _MyHomePageState extends State<MyHomePage> {
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   uiButton(0.17, 0.08, globals.style2, (){scientific('sqrt');}, '√'),
-                  uiButton(0.17, 0.08, globals.style3, (){numClicked('7');}, '7'),
-                  uiButton(0.17, 0.08, globals.style3, (){numClicked('8');}, '8'),
-                  uiButton(0.17, 0.08, globals.style3, (){numClicked('9');}, '9'),
+                  uiButton(0.18, 0.08, globals.style3, (){numClicked('7');}, '7'),
+                  uiButton(0.18, 0.08, globals.style3, (){numClicked('8');}, '8'),
+                  uiButton(0.18, 0.08, globals.style3, (){numClicked('9');}, '9'),
                   uiButton(0.17, 0.08, globals.style2, (){operClicked('-');}, '-'),
                 ],
               ),
@@ -435,9 +445,9 @@ class _MyHomePageState extends State<MyHomePage> {
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   uiButton(0.17, 0.08, globals.style2, (){scientific('ln');}, 'ln'),
-                  uiButton(0.17, 0.08, globals.style3, (){numClicked('4');}, '4'),
-                  uiButton(0.17, 0.08, globals.style3, (){numClicked('5');}, '5'),
-                  uiButton(0.17, 0.08, globals.style3, (){numClicked('6');}, '6'),
+                  uiButton(0.18, 0.08, globals.style3, (){numClicked('4');}, '4'),
+                  uiButton(0.18, 0.08, globals.style3, (){numClicked('5');}, '5'),
+                  uiButton(0.18, 0.08, globals.style3, (){numClicked('6');}, '6'),
                   uiButton(0.17, 0.08, globals.style2, (){operClicked('x');}, 'x'),
                 ],
               ),
@@ -445,9 +455,9 @@ class _MyHomePageState extends State<MyHomePage> {
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   uiButton(0.17, 0.08, globals.style2, (){constants('e');}, 'e'),
-                  uiButton(0.17, 0.08, globals.style3, (){numClicked('1');}, '1'),
-                  uiButton(0.17, 0.08, globals.style3, (){numClicked('2');}, '2'),
-                  uiButton(0.17, 0.08, globals.style3, (){numClicked('3');}, '3'),
+                  uiButton(0.18, 0.08, globals.style3, (){numClicked('1');}, '1'),
+                  uiButton(0.18, 0.08, globals.style3, (){numClicked('2');}, '2'),
+                  uiButton(0.18, 0.08, globals.style3, (){numClicked('3');}, '3'),
                   uiButton(0.17, 0.08, globals.style2, (){operClicked('÷');}, '÷'),
                 ],
               ),
@@ -455,9 +465,9 @@ class _MyHomePageState extends State<MyHomePage> {
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   uiButton(0.17, 0.08, globals.style2, (){constants('π');}, 'π'),
-                  uiButton(0.17, 0.08, globals.style2, changeSign, '±'),
-                  uiButton(0.17, 0.08, globals.style3, (){numClicked('0');}, '0'),
-                  uiButton(0.17, 0.08, globals.style2, (){numClicked('.');}, '.'),
+                  uiButton(0.18, 0.08, globals.style2, changeSign, '±'),
+                  uiButton(0.18, 0.08, globals.style3, (){numClicked('0');}, '0'),
+                  uiButton(0.18, 0.08, globals.style2, (){numClicked('.');}, '.'),
                   uiButton(0.17, 0.08, globals.style1, (){
                     calculate();
                     if (prevNum.isNotEmpty) {

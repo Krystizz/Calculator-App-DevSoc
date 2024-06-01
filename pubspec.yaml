@@ -40,6 +40,7 @@ dependencies:
   cloud_firestore: ^4.15.4
   http: ^1.2.0
   decimal: ^2.3.3
+  auto_size_text: ^3.0.0
 
 dev_dependencies:
   flutter_test:
