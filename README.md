@@ -7,13 +7,13 @@ appealing light and dark themes. The app uses Firebase Authentication to authent
 ## Screenshots
 
 ### Light Theme
-![Light Theme](images/LightTheme.jpg)
+![Light Theme](brand/images/LightTheme.jpg)
 
 ### Dark Theme
-![Dark Theme](images/DarkTheme.jpg)
+![Dark Theme](brand/images/DarkTheme.jpg)
 
 ### User History
-![User History](images/History.jpg)
+![User History](brand/images/History.jpg)
 
 ### Authentication
-![Authentication](images/Login.jpg)
+![Authentication](brand/images/Login.jpg)
