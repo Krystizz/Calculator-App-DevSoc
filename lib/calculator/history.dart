@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../data/globals.dart' as globals;
+import '../globals.dart' as globals;
 
 class HistoryPage extends StatelessWidget {
   HistoryPage({super.key});
@@ -10,13 +10,14 @@ class HistoryPage extends StatelessWidget {
 
   void clearHistory() {
     FirebaseFirestore.instance.collection(userID!).get().then((snapshot) {
-      for (DocumentSnapshot ds in snapshot.docs){ds.reference.delete();}
+      for (DocumentSnapshot ds in snapshot.docs) {
+        ds.reference.delete();
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-
     double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -26,13 +27,21 @@ class HistoryPage extends StatelessWidget {
         title: const Text('History'),
         centerTitle: true,
         actions: <Widget>[
-          IconButton(icon: const Icon(Icons.delete), onPressed: () {clearHistory();}),
+          IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: () {
+                clearHistory();
+              }),
         ],
       ),
-      body: Container(color: globals.backgroundColor,
+      body: Container(
+        color: globals.backgroundColor,
+        width: screenWidth,
         child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance.collection(userID!).
-            orderBy('time', descending: true).snapshots(),
+          stream: FirebaseFirestore.instance
+              .collection(userID!)
+              .orderBy('time', descending: true)
+              .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return ListView.builder(
@@ -40,25 +49,24 @@ class HistoryPage extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final doc = snapshot.data!.docs[index];
                   return Padding(
-                    padding: EdgeInsets.all(screenWidth*0.04),
-                    child:
-                      GestureDetector(
-                        onTap: () {
-                          globals.lastCalc = doc['calc'];
-                          globals.ans = doc['calc'].split(' = ')[1];
-                          Navigator.of(context).pop();
-                        },
-                        child: ListTile(
-                          title: Text(doc['calc'], style: const TextStyle(fontSize: 20)),
-                          textColor: globals.textColor,
-                        ),
+                    padding: EdgeInsets.all(screenWidth * 0.04),
+                    child: GestureDetector(
+                      onTap: () {
+                        globals.lastCalc = doc['calc'];
+                        globals.ans = doc['calc'].split(' = ')[1];
+                        Navigator.of(context).pop();
+                      },
+                      child: ListTile(
+                        title: Text(doc['calc'],
+                            style: const TextStyle(fontSize: 20)),
+                        textColor: globals.textColor,
                       ),
+                    ),
                   );
                 },
               );
-            }
-            else {
-                return const Center(child: CircularProgressIndicator());
+            } else {
+              return const Center(child: CircularProgressIndicator());
             }
           },
         ),

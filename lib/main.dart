@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'data/firebase_options.dart';
+import 'secrets/firebase_options.dart';
 import 'auth/login.dart';
 
 void main() async {
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrangeAccent),
         useMaterial3: true,
         scaffoldBackgroundColor: Colors.white,
-        ),
+      ),
       home: const AuthPage(),
     );
   }
