@@ -3,9 +3,8 @@
 Looking for a handy math companion?  
 Here is a calculator with all commonly used simple and scientific operations, a currency converter, pleasing dual themes and more.
 
-### Website: https://astrogenz.wixsite.com/astrogenz/calc
-### Google Play: https://play.google.com/store/apps/details?id=com.astrogenz.calculator
-### GitHub Repo: https://github.com/pranav-m-r/Calculator
+### Check out the app at:
+#### [Our Website](https://astrogenz.wixsite.com/astrogenz/calc), [Google Play](https://play.google.com/store/apps/details?id=com.astrogenz.calculator), [GitHub](https://github.com/pranav-m-r/Calculator)
 
 ## Features
 • The app provides support for all simple mathematical operations and scientific functions like the trigonometric, inverse trigonometric and logarithmic functions.  
