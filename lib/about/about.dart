@@ -82,11 +82,11 @@ class _AboutPageState extends State<AboutPage> {
                 spacing(0.01),
                 Text(
                   '© 2020-24 Astro Gen-Z',
-                  style: TextStyle(fontSize: 16, color: globals.textColor),
+                  style: TextStyle(fontSize: 18, color: globals.textColor),
                 ),
                 Text(
                   'Calculator v${globals.version}',
-                  style: TextStyle(fontSize: 24, color: globals.textColor),
+                  style: TextStyle(fontSize: 25, color: globals.textColor),
                 ),
                 spacing(0.01),
                 webButton("https://astrogenz.wixsite.com/astrogenz", "Website",
