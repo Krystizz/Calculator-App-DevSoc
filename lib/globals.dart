@@ -31,14 +31,14 @@ ButtonStyle style3 = ElevatedButton.styleFrom(
 );
 
 void showErrorMessage(String msg, BuildContext context) {
-  showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: backgroundColor,
-          title: Center(child: Text(msg, style: TextStyle(color: textColor))),
-        );
-      });
+  final snackBar = SnackBar(
+    showCloseIcon: true,
+    closeIconColor: textColor,
+    duration: const Duration(seconds: 5),
+    backgroundColor: backgroundColor,
+    content: Text(msg, style: TextStyle(color: textColor)),
+  );
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
 void darkTheme() {
@@ -90,6 +90,8 @@ void darkTheme() {
 }
 
 String formatNumber(String num) {
+  Decimal sign = (double.parse(num) < 0) ? Decimal.parse('-1') : Decimal.parse('1');
+  num = Decimal.parse(num).abs().toString();
   if (Decimal.parse(num) > Decimal.parse('1e10')) {
     num = Decimal.parse(num).toStringAsExponential(3);
   } else if (Decimal.parse(num) < Decimal.parse('1e-5')) {
@@ -102,6 +104,7 @@ String formatNumber(String num) {
       num.substring(num.indexOf('.'), num.length).length > 6) {
     num = Decimal.parse(num).toStringAsFixed(5);
   }
+  num = (Decimal.parse(num) * sign).toString();
   return num;
 }
 

@@ -83,14 +83,14 @@ class _MyHomePageState extends State<MyHomePage> {
             newNum = num2.toString();
           } catch (e) {
             globals.showErrorMessage('Math Error (Invalid Input)', context);
-            clear();
+            shouldClear = false;
             return;
           }
         } else if (oper == '÷') {
           if (num2 == Decimal.parse('0.0')) {
             globals.showErrorMessage(
                 'Math Error (Cannot divide by zero)', context);
-            clear();
+            shouldClear = false;
             return;
           } else {
             globals.ans = (num1 / num2).toDouble().toString();
@@ -460,7 +460,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   }, '.'),
                   globals.uiButton(btnHeight, globals.style1, () {
                     calculate();
-                    if (prevNum.isNotEmpty) {
+                    if (prevNum.isNotEmpty && shouldClear) {
                       save(globals.lastCalc);
                     }
                   }, '='),
