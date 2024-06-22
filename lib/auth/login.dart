@@ -35,6 +35,7 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
 
   void signUserIn() async {
+    FocusManager.instance.primaryFocus?.unfocus();
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
       globals.showErrorMessage(
           'Please fill in your authentication details!', context);
@@ -61,6 +62,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void signUserUp() async {
+    FocusManager.instance.primaryFocus?.unfocus();
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
       globals.showErrorMessage(
           'Please fill in your authentication details!', context);
@@ -126,6 +128,9 @@ class _LoginPageState extends State<LoginPage> {
           child: TextField(
             controller: ctr,
             obscureText: obscure,
+            onTapOutside: (event) {
+              FocusManager.instance.primaryFocus?.unfocus();
+            },
             style: TextStyle(color: globals.textColor, fontSize: 18),
             decoration: InputDecoration(
                 enabledBorder: const OutlineInputBorder(
