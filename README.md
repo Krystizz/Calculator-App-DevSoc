@@ -18,10 +18,10 @@ Thanks to these wonderful people for helping me complete this project!
 • App Graphic Foreground: [Image](brand/Foreground.jpg) by [Wallpapers.com](https://wallpapers.com/wallpapers/colorful-space-3840-x-2160-wallpaper-00om36tb4ezcv74g.html)
 
 ## Screenshots
-![Screenshot-1](<brand/Screenshots/SS (1).jpg>)
-![Screenshot-2](<brand/Screenshots/SS (2).jpg>)
-![Screenshot-3](<brand/Screenshots/SS (3).jpg>)
-![Screenshot-4](<brand/Screenshots/SS (4).jpg>)
-![Screenshot-5](<brand/Screenshots/SS (5).jpg>)
-![Screenshot-6](<brand/Screenshots/SS (6).png>)
-![Screenshot-7](<brand/Screenshots/SS (7).png>)
+<img src="brand/Screenshots/SS (1).jpg" width="250"/>
+<img src="brand/Screenshots/SS (2).jpg" width="250"/>
+<img src="brand/Screenshots/SS (3).jpg" width="250"/>
+<img src="brand/Screenshots/SS (4).jpg" width="250"/>
+<img src="brand/Screenshots/SS (5).jpg" width="250"/>
+<img src="brand/Screenshots/SS (6).png" width="250"/>
+<img src="brand/Screenshots/SS (7).png" width="250"/>
