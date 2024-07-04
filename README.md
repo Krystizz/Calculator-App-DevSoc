@@ -1,7 +1,9 @@
 # Calculator
-![Banner](<brand/Feature Graphic.png>)
 Looking for a handy math companion?  
 Here is a calculator with all commonly used simple and scientific operations, a currency converter, pleasing dual themes and more.
+<p float="left">
+  <img src="brand/Feature Graphic.png" width="800"/>
+</p>
 
 ## Features
 • The app provides support for all simple mathematical operations and scientific functions like the trigonometric, inverse trigonometric and logarithmic functions.  
@@ -11,7 +13,8 @@ Here is a calculator with all commonly used simple and scientific operations, a 
 
 ## Credits
 Thanks to these wonderful people for helping me complete this project!  
-• Developers' Society, BITS Goa: A big thanks to DevSoc for giving me this project and providing helpful resources along the way!
+• Developers' Society, BITS Goa:  
+A big thanks to DevSoc for giving me this project and providing helpful resources along the way!  
 • App Icon Background: [Icon](brand/Background.png) by [Freepik](https://www.freepik.com/icon/calculator_1326142)  
 • App Graphic Foreground: [Image](brand/Foreground.jpg) by [Wallpapers.com](https://wallpapers.com/wallpapers/colorful-space-3840-x-2160-wallpaper-00om36tb4ezcv74g.html)
 
