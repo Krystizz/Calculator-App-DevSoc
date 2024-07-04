@@ -24,4 +24,4 @@ Thanks to these wonderful people for helping me complete this project!
   <img src="brand/Screenshots/SS (5).jpg" width="250"/>
   <img src="brand/Screenshots/SS (6).png" width="250"/>
   <img src="brand/Screenshots/SS (7).png" width="250"/>
-</p>p
+</p>
