@@ -153,9 +153,6 @@ class _LoginPageState extends State<LoginPage> {
           backgroundColor: globals.appBarColor,
           title: const Text('Sign In'),
           centerTitle: true,
-          leading: IconButton(
-              icon: const ImageIcon(AssetImage('assets/icon.png')),
-              onPressed: () {}),
           actions: <Widget>[
             IconButton(
               icon: Icon(globals.themeIcon),

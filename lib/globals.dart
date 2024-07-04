@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:decimal/decimal.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 
 String version = 'Unknown';
 
@@ -127,17 +126,6 @@ SizedBox uiButton(
   );
 }
 
-SizedBox trigButton(
-    double height, ButtonStyle style, void Function() func, String txt, int n) {
-  return SizedBox(
-      width: height,
-      height: height,
-      child: ElevatedButton(
-          style: style,
-          onPressed: func,
-          child: AutoSizeText(txt, minFontSize: 10, maxLines: n)));
-}
-
 SizedBox textBox(double width, double height, String text) {
   return SizedBox(
       width: width,
@@ -148,10 +136,7 @@ SizedBox textBox(double width, double height, String text) {
                   borderRadius: BorderRadius.circular(15)),
               backgroundColor: textBoxColor),
           onPressed: null,
-          child: AutoSizeText(text,
-              minFontSize: 20,
-              maxFontSize: 25,
-              maxLines: 1,
+          child: Text(text,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: textColor))));
+              style: TextStyle(color: textColor, fontSize: 25))));
 }

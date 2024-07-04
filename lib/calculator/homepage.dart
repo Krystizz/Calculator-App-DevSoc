@@ -5,7 +5,6 @@ import 'package:decimal/decimal.dart';
 import 'dart:math' as math;
 import 'history.dart';
 import '../currency/currency.dart';
-import '../about/about.dart';
 import '../globals.dart' as globals;
 
 class MyHomePage extends StatefulWidget {
@@ -311,21 +310,6 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
             ListTile(
-              title:
-                  Text('About Us', style: TextStyle(color: globals.textColor)),
-              leading: Icon(Icons.info_outlined, color: globals.textColor),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.of(context)
-                    .push(MaterialPageRoute(
-                        builder: (context) => const AboutPage()))
-                    .then((value) {
-                  setState(() {});
-                });
-              },
-            ),
-            const Divider(),
-            ListTile(
               title: Text((!globals.darkEnabled) ? 'Dark Theme' : 'Light Theme',
                   style: TextStyle(color: globals.textColor)),
               leading: Icon(globals.themeIcon, color: globals.textColor),
@@ -353,15 +337,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   globals.uiButton(btnHeight, globals.style1, clear, 'C'),
-                  globals.trigButton(btnHeight, globals.style2, () {
+                  globals.uiButton(btnHeight, globals.style2, () {
                     scientific('sin');
-                  }, 'sin', 1),
-                  globals.trigButton(btnHeight, globals.style2, () {
+                  }, 'sin'),
+                  globals.uiButton(btnHeight, globals.style2, () {
                     scientific('cos');
-                  }, 'cos', 1),
-                  globals.trigButton(btnHeight, globals.style2, () {
+                  }, 'cos'),
+                  globals.uiButton(btnHeight, globals.style2, () {
                     scientific('tan');
-                  }, 'tan', 1),
+                  }, 'tan'),
                   globals.uiButton(btnHeight, globals.style1, backspace, '⌫'),
                 ],
               ),
@@ -371,15 +355,15 @@ class _MyHomePageState extends State<MyHomePage> {
                   globals.uiButton(btnHeight, globals.style2, () {
                     operClicked('^');
                   }, '^'),
-                  globals.trigButton(btnHeight, globals.style2, () {
+                  globals.uiButton(btnHeight, globals.style2, () {
                     scientific('arcsin');
-                  }, 'arc\nsin', 2),
-                  globals.trigButton(btnHeight, globals.style2, () {
+                  }, 'arc\nsin'),
+                  globals.uiButton(btnHeight, globals.style2, () {
                     scientific('arccos');
-                  }, 'arc\ncos', 2),
-                  globals.trigButton(btnHeight, globals.style2, () {
+                  }, 'arc\ncos'),
+                  globals.uiButton(btnHeight, globals.style2, () {
                     scientific('arctan');
-                  }, 'arc\ntan', 2),
+                  }, 'arc\ntan'),
                   globals.uiButton(btnHeight, globals.style2, () {
                     operClicked('+');
                   }, '+'),

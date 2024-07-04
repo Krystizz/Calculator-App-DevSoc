@@ -45,3 +45,5 @@ app.*.map.json
 keystore/Calc_keystore.jks
 lib/secrets/secrets.dart
 lib/secrets/firebase_options.dart
+android/app/google-services.json
+firebase.json

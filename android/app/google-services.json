@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "910904278035",
-    "project_id": "calculator-agz",
-    "storage_bucket": "calculator-agz.appspot.com"
+    "project_number": "324348154401",
+    "project_id": "calculator-pmr",
+    "storage_bucket": "calculator-pmr.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:910904278035:android:ae07386747d3bb380e13e6",
+        "mobilesdk_app_id": "1:324348154401:android:48c89ff3a2c6fc178cc960",
         "android_client_info": {
-          "package_name": "com.astrogenz.calculator"
+          "package_name": "com.pranavmr.calculator"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCi5JzwQ3j-eQH4Vh9v8CkkrXfoysGX5ns"
+          "current_key": "AIzaSyDct9qV9hslBDXFml_P65cvgkUR1G0BlW8"
         }
       ],
       "services": {
