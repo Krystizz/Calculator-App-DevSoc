@@ -5,7 +5,7 @@ import 'package:decimal/decimal.dart';
 import 'dart:math' as math;
 import 'history.dart';
 import '../currency/currency.dart';
-import '../globals.dart' as globals;
+import '../data/themedata.dart' as globals;
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({super.key});
@@ -25,11 +25,48 @@ class _MyHomePageState extends State<MyHomePage> {
   Decimal temp = Decimal.parse('0.0');
   bool shouldClear = false;
 
-  void save(String lastCalc) async {
+  final pwd = TextEditingController();
+
+  void saveHistory(String lastCalc) async {
     await FirebaseFirestore.instance.collection(widget.userID!).add({
       'calc': lastCalc,
       'time': DateTime.now(),
     });
+  }
+
+  void signUserOut() {
+    FirebaseAuth.instance.signOut();
+  }
+
+  void deleteAccount() async {
+    if (pwd.text.isEmpty) {
+      globals.showErrorMessage('Please enter your password', context);
+      return;
+    }
+    try {
+      User user = FirebaseAuth.instance.currentUser!;
+      AuthCredential credentials = EmailAuthProvider.credential(
+          email: widget.userID!, password: pwd.text);
+      await user.reauthenticateWithCredential(credentials);
+      FirebaseFirestore.instance
+          .collection(widget.userID!)
+          .get()
+          .then((snapshot) {
+        for (DocumentSnapshot ds in snapshot.docs) {
+          ds.reference.delete();
+        }
+      });
+      await user.delete();
+      if (mounted) {
+        Navigator.pop(context);
+        globals.showErrorMessage('Account Deleted', context);
+      }
+    } catch (e) {
+      if (mounted) {
+        globals.showErrorMessage(
+            "Authentication Error (${e.toString()})", context);
+      }
+    }
   }
 
   void backspace() {
@@ -211,7 +248,7 @@ class _MyHomePageState extends State<MyHomePage> {
         globals.ans = globals.formatNumber(globals.ans);
         prevNum = globals.formatNumber(prevNum);
         globals.lastCalc = '$s($prevNum) = ${globals.ans}';
-        save(globals.lastCalc);
+        saveHistory(globals.lastCalc);
       } catch (e) {
         globals.showErrorMessage('Math Error (Invalid Input)', context);
       }
@@ -219,15 +256,72 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void signUserOut() {
-    FirebaseAuth.instance.signOut();
-  }
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     double btnHeight = screenHeight * 0.085;
+
+    Future showDeleteDialog() {
+      return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: globals.backgroundColor,
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Icon(Icons.delete_forever, size: 28, color: globals.textColor),
+                Text("Delete Account",
+                    style: TextStyle(color: globals.textColor)),
+                const SizedBox(),
+                const SizedBox(),
+              ],
+            ),
+            content: TextField(
+              controller: pwd,
+              obscureText: true,
+              onTapOutside: (event) {
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
+              decoration: InputDecoration(
+                  enabledBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey.shade400),
+                  ),
+                  fillColor: globals.textBoxColor,
+                  filled: true,
+                  hintText: "Password",
+                  hintStyle: TextStyle(color: Colors.grey.shade500)),
+            ),
+            actions: <Widget>[
+              SizedBox(
+                height: screenHeight * 0.07,
+                child: ElevatedButton(
+                  style: globals.style1,
+                  onPressed: deleteAccount,
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text(
+                        "Confirm",
+                        style: TextStyle(fontSize: 25),
+                      ),
+                      Icon(
+                        Icons.arrow_forward,
+                        size: 25,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -260,6 +354,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
+            ListTile(
+              title: Text((!globals.darkEnabled) ? 'Dark Theme' : 'Light Theme',
+                  style: TextStyle(color: globals.textColor)),
+              leading: Icon(globals.themeIcon, color: globals.textColor),
+              onTap: () {
+                setState(() {
+                  globals.darkTheme();
+                });
+              },
+            ),
+            const Divider(),
             ListTile(
               title: Text('Calculator',
                   style: TextStyle(color: globals.textColor)),
@@ -310,12 +415,13 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
             ListTile(
-              title: Text((!globals.darkEnabled) ? 'Dark Theme' : 'Light Theme',
+              title: Text('Delete Account',
                   style: TextStyle(color: globals.textColor)),
-              leading: Icon(globals.themeIcon, color: globals.textColor),
+              leading: Icon(Icons.delete_forever, color: globals.textColor),
               onTap: () {
                 setState(() {
-                  globals.darkTheme();
+                  clear();
+                  showDeleteDialog();
                 });
               },
             ),
@@ -445,7 +551,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   globals.uiButton(btnHeight, globals.style1, () {
                     calculate();
                     if (prevNum.isNotEmpty && shouldClear) {
-                      save(globals.lastCalc);
+                      saveHistory(globals.lastCalc);
                     }
                   }, '='),
                 ],

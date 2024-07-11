@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:decimal/decimal.dart';
 
-String version = 'Unknown';
-
 bool darkEnabled = false;
 Color textColor = Colors.black;
 Color textBoxColor = Colors.grey.shade200;
@@ -37,6 +35,7 @@ void showErrorMessage(String msg, BuildContext context) {
     backgroundColor: backgroundColor,
     content: Text(msg, style: TextStyle(color: textColor)),
   );
+  ScaffoldMessenger.of(context).hideCurrentSnackBar();
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 

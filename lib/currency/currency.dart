@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:decimal/decimal.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../globals.dart' as globals;
+import '../data/themedata.dart' as globals;
 import '../secrets/secrets.dart' as secrets;
 import 'currlist.dart' as currencies;
 

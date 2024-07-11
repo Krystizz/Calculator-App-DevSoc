@@ -2,7 +2,8 @@
 Looking for a handy math companion?  
 Here is a calculator with all commonly used simple and scientific operations, a currency converter, pleasing dual themes and more.
 
-#### Designed & Developed By [Pranav M R](https://github.com/pranav-m-r) (2023)
+#### Designed & developed by [Pranav M R](https://github.com/pranav-m-r)
+#### Available for download on [Google Play](https://play.google.com/store/apps/details?id=com.pranavmr.calculator)
 
 ![Banner](<brand/TV Banner.png>)
 

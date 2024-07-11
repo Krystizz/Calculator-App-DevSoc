@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../globals.dart' as globals;
+import '../data/themedata.dart' as globals;
 
 class HistoryPage extends StatelessWidget {
   HistoryPage({super.key});

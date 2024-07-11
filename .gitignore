@@ -42,7 +42,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-keystore/Calc_keystore.jks
+keystore/keystore.jks
 lib/secrets/secrets.dart
 lib/secrets/firebase_options.dart
 android/app/google-services.json

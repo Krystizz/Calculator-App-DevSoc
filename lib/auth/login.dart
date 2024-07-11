@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../calculator/homepage.dart';
-import '../globals.dart' as globals;
+import '../data/themedata.dart' as globals;
 
 class AuthPage extends StatelessWidget {
   const AuthPage({super.key});
@@ -33,12 +33,39 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final validUserChars = RegExp(r'^[a-zA-Z0-9]+$');
+  final validPwdChars = RegExp(r'^[a-zA-Z0-9!@#$%&*]+$');
 
   void signUserIn() async {
     FocusManager.instance.primaryFocus?.unfocus();
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
       globals.showErrorMessage(
           'Please fill in your authentication details!', context);
+      return;
+    }
+    if (!validUserChars.hasMatch(emailController.text)) {
+      globals.showErrorMessage(
+          'Authentication Error (Username must only contain English alphabets and digits)',
+          context);
+      return;
+    }
+    if (emailController.text.length < 6 || emailController.text.length > 20) {
+      globals.showErrorMessage(
+          'Authentication Error (Username must contain 6-20 characters)',
+          context);
+      return;
+    }
+    if (!validPwdChars.hasMatch(passwordController.text)) {
+      globals.showErrorMessage(
+          'Authentication Error (Password contains invalid characters)',
+          context);
+      return;
+    }
+    if (passwordController.text.length < 6 ||
+        passwordController.text.length > 20) {
+      globals.showErrorMessage(
+          'Authentication Error (Password must contain 6-20 characters)',
+          context);
       return;
     }
     showDialog(
@@ -48,15 +75,16 @@ class _LoginPageState extends State<LoginPage> {
         });
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text,
+        email: "${emailController.text}@gmail.com",
         password: passwordController.text,
       );
+      if (mounted) ScaffoldMessenger.of(context).hideCurrentSnackBar();
       if (mounted) Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       if (mounted) {
         Navigator.pop(context);
         globals.showErrorMessage(
-            'Authentication Error (${e.code}: ${e.message})', context);
+            'Authentication Error (${e.message})', context);
       }
     }
   }
@@ -68,6 +96,31 @@ class _LoginPageState extends State<LoginPage> {
           'Please fill in your authentication details!', context);
       return;
     }
+    if (!validUserChars.hasMatch(emailController.text)) {
+      globals.showErrorMessage(
+          'Authentication Error (Username must only contain English alphabets and digits)',
+          context);
+      return;
+    }
+    if (emailController.text.length < 6 || emailController.text.length > 20) {
+      globals.showErrorMessage(
+          'Authentication Error (Username must contain 6-20 characters)',
+          context);
+      return;
+    }
+    if (!validPwdChars.hasMatch(passwordController.text)) {
+      globals.showErrorMessage(
+          'Authentication Error (Password contains invalid characters)',
+          context);
+      return;
+    }
+    if (passwordController.text.length < 6 ||
+        passwordController.text.length > 20) {
+      globals.showErrorMessage(
+          'Authentication Error (Password must contain 6-20 characters)',
+          context);
+      return;
+    }
     showDialog(
         context: context,
         builder: (context) {
@@ -75,15 +128,16 @@ class _LoginPageState extends State<LoginPage> {
         });
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text,
+        email: "${emailController.text}@gmail.com",
         password: passwordController.text,
       );
+      if (mounted) ScaffoldMessenger.of(context).hideCurrentSnackBar();
       if (mounted) Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       if (mounted) {
         Navigator.pop(context);
         globals.showErrorMessage(
-            'Authentication Error (${e.code}: ${e.message})', context);
+            'Authentication Error (${e.message})', context);
       }
     }
   }
@@ -195,7 +249,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       spacing(0.05),
-                      loginText(emailController, false, 'Email'),
+                      loginText(emailController, false, 'Username'),
                       spacing(0.02),
                       loginText(passwordController, true, 'Password'),
                       spacing(0.05),
